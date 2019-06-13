@@ -1,0 +1,29 @@
+{% load bootstrap3 %}
+
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+{% block bootstrap3_content %}
+
+<div class="container">
+    <nav  class="navbar navbar-default">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="{% url 'reviews:review_list' %}">RateRestaurant</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="{% url 'reviews:review_list' %}">Home</a></li>
+                <li><a href="{% url 'reviews:restaurant_list' %}">Restaurant list</a></li>
+            </ul>
+        </div>
+    </nav>
+    
+
+    <h1>{% block title %}(no title){% endblock %}</h1>
+
+    {% bootstrap_messages %}
+
+    {% block content %}(no content){% endblock %}
+</div>
+
+{% endblock %}

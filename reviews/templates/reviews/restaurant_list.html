@@ -1,0 +1,23 @@
+{% extends 'reviews/base.html' %}
+
+{% block title %}
+<h2>Restaurant list</h2>
+{% endblock %}
+
+{% block content %}
+{% if restaurant_list %}
+<div class="row">
+    {% for restaurant in restaurant_list %}
+    <div class="col-xs-6 col-lg-4">
+        <h4><a href="{% url 'reviews:restaurant_detail' restaurant.id %}">
+        {{ restaurant.name }}
+        </a></h4>
+        <h5>{{ restaurant.review_set.count }} reviews</h5>
+        <h5>{{ restaurant.average_rating | floatformat }} average rating</h5>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+    <p>No restaurants are available.</p>
+{% endif %}
+{% endblock %}
