@@ -1,5 +1,4 @@
-<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+{% load bootstrap3 %}
 
 {% bootstrap_css %}
 {% bootstrap_javascript %}
@@ -19,7 +18,7 @@
             <ul class="nav navbar-nav navbar-right">
             {% if user.is_authenticated %}
                 <li><a href="{% url 'reviews:user_review_list' user.username %}">Hello {{ user.username }}</a></li>
-                <li><a href="{% url 'reviews:user_recommendation_list' %}">Restaurant suggestions</a></li>
+                <li><a href="{% url 'reviews:user_recommendation_list' %}">Wine suggestions</a></li>
                 <li><a href="{% url 'auth:logout' %}">Logout</a></li>
                 {% else %}
                 <li><a href="{% url 'auth:login' %}">Login</a></li>
