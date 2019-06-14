@@ -27,4 +27,6 @@ from django.urls import path
 urlpatterns = [
     path('', include(('reviews.urls','reviews'), namespace='reviews')),
     path('admin/', admin.site.urls),
+    path('accounts/',include('registration.backends.simple.urls')),
+    path('accounts/',include(('django.contrib.auth.urls','registration'), namespace='auth'))
 ]
