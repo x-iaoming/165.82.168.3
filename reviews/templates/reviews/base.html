@@ -1,14 +1,14 @@
-<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
 {% load bootstrap3 %}
 {% bootstrap_css %}
 {% bootstrap_javascript %}
 
 {% block bootstrap3_content %}
+<title>Welcome to ruimingli.com</title>
+
 <div class="container">
     <nav class="navbar navbar-default">
         <div class="navbar-header">
-            <a class="navbar-brand" href="{% url 'reviews:review_list' %}">RateRestaurant</a>
+            <a class="navbar-brand" href="{% url 'reviews:review_list' %}">Restaurant Recommender</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
@@ -16,7 +16,7 @@
                 </li>
                 <li><a href="{% url 'reviews:restaurant_list' %}">Restaurant list</a>
             </ul>
-            <ul class="nav navbar-nav navbar-right">
+            <ul class="nav navbar-nav navbar-right">    
             {% if user.is_authenticated %}
                 <li><a href="{% url 'reviews:user_review_list' user.username %}">Hello {{ user.username }}</a></li>
                 <li><a href="{% url 'reviews:user_recommendation_list' %}">Restaurant suggestions</a></li>
@@ -27,7 +27,12 @@
             </ul>
         </div>
     </nav>
-    
+
+    <div class="panel panel-default"> 
+        <div class="panel-heading"><h4>Rate restaurants and get recommendations based on people with similar preferences</h4></div>
+        <div class="panel-body"><footer><a href="https://www.linkedin.com/in/ruiming100/">Ray (Ruiming) Li</a>: <a href="mailto:ruiming100@gmail.com?Subject=Hello%20Ray" target="_top">ruiming100@gmail.com</a><br>developed this sample web-based machine learning project.</footer><footer><br>He made use of nginx + uwsgi + django framework and K-Nearest Neighbor algorithm in sklearn package. He would like to give special thanks to server at Haverford College and step-by-step django tutorial by Jose A Dianes.</footer></div>
+    </div>
+
 
     <h1>{% block title %}(no title){% endblock %}</h1>
 
