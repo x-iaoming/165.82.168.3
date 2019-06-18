@@ -1,13 +1,14 @@
 {% load bootstrap3 %}
-
 {% bootstrap_css %}
 {% bootstrap_javascript %}
 
 {% block bootstrap3_content %}
+<title>Welcome to Ray's Website</title>
+
 <div class="container">
     <nav class="navbar navbar-default">
         <div class="navbar-header">
-            <a class="navbar-brand" href="{% url 'reviews:review_list' %}">RateRestaurant</a>
+            <a class="navbar-brand" href="{% url 'reviews:review_list' %}">Restaurant Recommender</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
@@ -15,18 +16,18 @@
                 </li>
                 <li><a href="{% url 'reviews:restaurant_list' %}">Restaurant list</a>
             </ul>
-            <ul class="nav navbar-nav navbar-right">
+            <ul class="nav navbar-nav navbar-right">    
             {% if user.is_authenticated %}
                 <li><a href="{% url 'reviews:user_review_list' user.username %}">Hello {{ user.username }}</a></li>
-                <li><a href="{% url 'reviews:user_recommendation_list' %}">Wine suggestions</a></li>
+                <li><a href="{% url 'reviews:user_recommendation_list' %}">Restaurant suggestions</a></li>
                 <li><a href="{% url 'auth:logout' %}">Logout</a></li>
                 {% else %}
+                <li><a href="/accounts/register">Register</a></li>
                 <li><a href="{% url 'auth:login' %}">Login</a></li>
                 {% endif %}
             </ul>
         </div>
     </nav>
-    
 
     <h1>{% block title %}(no title){% endblock %}</h1>
 

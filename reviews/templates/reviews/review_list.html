@@ -1,15 +1,14 @@
-{% extends 'reviews/base.html' %}
-
-<div class="panel panel-default"> 
-    <div class="panel-heading"><h4>Rate restaurants and get recommendations based on people with similar preferences</h4></div>
-    <div class="panel-body"><footer><a href="https://www.linkedin.com/in/ruiming100/">Ray (Ruiming) Li</a>: <a href="mailto:ruiming100@gmail.com?Subject=Hello%20Ray" target="_top">ruiming100@gmail.com</a><br>developed this sample web-based machine learning project.</footer><footer><br>He made use of nginx + uwsgi + django framework and K-Nearest Neighbor algorithm in sklearn package. He would like to give special thanks to server at Haverford College and step-by-step django tutorial by Jose A Dianes.</footer></div>
-</div>
+{% extends 'base.html' %}
 
 {% block title %}
-<h2>Latest reviews</h2>
 {% endblock %}
 
 {% block content %}
+<div class="panel panel-default"> 
+    <div class="panel-heading"><h4>Rate restaurants and get recommendations based on people with similar preferences</h4></div>
+    <div class="panel-body"><footer><a href="https://www.linkedin.com/in/ruiming100/">Ray (Ruiming) Li</a>: <a href="mailto:ruiming100@gmail.com?Subject=Hello%20Ray" target="_top">ruiming100@gmail.com</a><br>developed this sample web-based machine learning project.</footer><footer><br>He made use of nginx + uwsgi + django framework and K-Nearest Neighbor algorithm in sklearn package. He would like to give special thanks to server at Haverford College and step-by-step django tutorial by Jose A Dianes. Click register to give it a try ;)</footer></div>
+</div>
+<h2>Latest reviews</h2>
 {% if latest_review_list %}
 <div class="row">
     {% for review in latest_review_list %}
