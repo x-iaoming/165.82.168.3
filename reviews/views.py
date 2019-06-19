@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404, render
 from .models import Restaurant, Review, Cluster
 from .forms import ReviewForm
 from django.http import HttpResponseRedirect
+from django.http import HttpResponseForbidden
 from django.urls import reverse
 import datetime
 from django.contrib.auth.decorators import login_required
@@ -9,7 +10,10 @@ from django.contrib.auth.models import User
 from .suggestions import update_clusters
 
 def review_list(request):
-    latest_review_list = Review.objects.order_by('-pub_date')[:9]
+    if request.user.is_authenticated:
+        latest_review_list = Review.objects.exclude(users_reported=request.user).order_by('-pub_date')[:9]
+    else:
+        latest_review_list = Review.objects.order_by('-pub_date')[:9]
     context = {'latest_review_list':latest_review_list}
     return render(request,'reviews/review_list.html',context)
 
@@ -27,7 +31,15 @@ def restaurant_list(request):
 def restaurant_detail(request,restaurant_id):
     restaurant = get_object_or_404(Restaurant, pk=restaurant_id)
     form = ReviewForm()
-    return render(request, 'reviews/restaurant_detail.html', {'restaurant':restaurant})
+    if request.user.is_authenticated:
+        restaurant_review_list = Review.objects.filter(restaurant=restaurant_id).exclude(users_reported=request.user)
+    else: 
+        restaurant_review_list = Review.objects.filter(restaurant=restaurant_id)
+    context = {'restaurant_review_list':restaurant_review_list,
+               'restaurant':restaurant
+            }
+    # {'restaurant':restaurant}
+    return render(request, 'reviews/restaurant_detail.html', context)
 
 @login_required
 def add_review(request, restaurant_id):
@@ -56,6 +68,56 @@ def add_review(request, restaurant_id):
         return HttpResponseRedirect(reverse('reviews:restaurant_detail', kwargs={'restaurant_id':restaurant_id}))
     
     return render(request, 'reviews/restaurant_detail.html', {'restaurant': restaurant, 'form': form})
+
+@login_required
+def edit_review(request, review_id):
+    review = get_object_or_404(Review, pk=review_id)
+    if review.user_name != request.user.username:
+        return HttpResponseForbidden()
+
+    form = ReviewForm(request.POST or None, instance=review)
+    if request.POST and form.is_valid():
+        form.save()
+
+        # Save was successful, so redirect to another page
+        next = request.POST.get('next', '/')
+        return HttpResponseRedirect(next)
+
+    return render(request, 'reviews/edit_review.html', {
+        'review': review,
+        'form': form
+    })
+
+@login_required
+def delete_review(request, review_id):
+    review = get_object_or_404(Review, pk=review_id)
+    user_name = review.user_name
+    if user_name != request.user.username:
+        return HttpResponseForbidden()
+
+    review.delete()
+    next = request.POST.get('next', '/')
+    return HttpResponseRedirect(next)
+
+    # return render(request, 'reviews/edit_review.html', {
+    #     'review': review,
+    #     'form': form
+    # })
+
+@login_required
+def report_review(request, review_id):
+    review = get_object_or_404(Review, pk=review_id)
+    if request.user in review.users_reported.all():
+    #if review in request.user.userprofile.report_review_set.all():
+        next = request.POST.get('next', '/')
+        return HttpResponseRedirect(next)
+    else:
+        review.users_reported.add(request.user)
+        if review.get_report_counts() >= 5:
+            review.delete()
+        next = request.POST.get('next', '/')
+        return HttpResponseRedirect(next)
+
 
 def user_review_list(request,username=None):
     if not username:

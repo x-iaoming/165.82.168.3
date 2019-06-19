@@ -57,6 +57,7 @@ class Review(models.Model):
     )
 
     restaurant = models.ForeignKey(Restaurant,on_delete=models.PROTECT)
+    users_reported = models.ManyToManyField(User)
     pub_date = models.DateTimeField('date published')
     user_name = models.CharField(max_length=100)
     prof_name = models.CharField(max_length=100,default='')
@@ -70,10 +71,22 @@ class Review(models.Model):
     work_load = models.CharField(choices=WORK_LOAD,max_length=2,default='M')
     diff_level = models.CharField(choices=DIFF_LEVEL,max_length=1,default='M')
 
+    def get_users_reported(self):
+        return "\n".join([u.username for u in self.users_reported.all()])
+    
+    def get_report_counts(self):
+        return self.users_reported.all().count()
+    # def get_reports(self):
+    #     return "\n".join([r.report_review for r in self.Review.all()])
+
+    # def get_username(self):
+    #     return "\n".join([u.username for u in self.users.all()])
 
 class Cluster(models.Model):
     name = models.CharField(max_length=100)
     users = models.ManyToManyField(User)
+
     def get_members(self):
         return "\n".join([u.username for u in self.users.all()])
+
 

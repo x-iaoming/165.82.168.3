@@ -18,6 +18,8 @@ from django.conf.urls import url
 from django.urls import include
 from django.urls import path
 
+# from django_registration.backends.activation.views import RegistrationView
+# from .regist_form import MyCustomUserForm
 
 # urlpatterns = [
 #     path('admin/', admin.site.urls),
@@ -25,8 +27,11 @@ from django.urls import path
 # ]
 
 urlpatterns = [
+    path('accounts/',include('django_registration.backends.one_step.urls')),
+    path('accounts/',include(('django.contrib.auth.urls','django_registration'), namespace='auth')),
     path('', include(('reviews.urls','reviews'), namespace='reviews')),
     path('admin/', admin.site.urls),
-    path('accounts/',include('django_registration.backends.one_step.urls')),
-    path('accounts/',include(('django.contrib.auth.urls','django_registration'), namespace='auth'))
 ]
+
+    # path('accounts/',include('django_registration.backends.one_step.urls')),
+    # path('accounts/',include(('django.contrib.auth.urls','django_registration'), namespace='auth'))

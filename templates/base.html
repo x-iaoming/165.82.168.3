@@ -13,18 +13,25 @@
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
                 </li>
-                <li><a href="{% url 'reviews:restaurant_list' %}">Class list</a>
-            </ul>
-            <ul class="nav navbar-nav navbar-right">    
+                <li><a href="{% url 'reviews:restaurant_list' %}">Find Class Reviews</a>
+            
             {% if user.is_authenticated %}
-                <li><a href="{% url 'reviews:user_review_list' user.username %}">Hello {{ user.username }}</a></li>
                 <li><a href="{% url 'reviews:user_recommendation_list' %}">My Class Recommendations</a></li>
+            {% else %}
+                <li><a href="{% url 'auth:login' %}">Class Recommendations</a></li>
+            {% endif %}
+            </ul> 
+
+            <ul class="nav navbar-nav navbar-right">  
+                {% if user.is_authenticated %}
+                <li><a href="{% url 'reviews:user_review_list' user.username %}"> My Reivews </a></li>
                 <li><a href="{% url 'auth:logout' %}">Logout</a></li>
+            </ul>
                 {% else %}
                 <li><a href="/accounts/register">Register</a></li>
                 <li><a href="{% url 'auth:login' %}">Login</a></li>
                 {% endif %}
-            </ul>
+            
         </div>
     </nav>
 

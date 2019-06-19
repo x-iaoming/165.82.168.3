@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+
+{% block title %}
+<h3>Edit your review</h3>
+{% endblock %}
+
+{% block content %}
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+<form action="{% url 'reviews:edit_review' review.id %}" method="post" class="form">
+    {% csrf_token %}
+
+    {% for field in form %}
+        {% bootstrap_field field %}
+    {% endfor %}
+
+    <button type="submit" class="btn btn-primary"> Save </button>
+    <a href="{% url 'reviews:user_review_list' user.username %}"> Cancel </a>
+
+</form>
+{% endblock %}

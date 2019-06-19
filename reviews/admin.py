@@ -1,9 +1,13 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth.models import User
 from .models import Restaurant, Review, Cluster
 
 class ReviewAdmin(admin.ModelAdmin):
 	model = Review
-	list_display = ('restaurant','rating','user_name','prof_name','comment','pub_date','pre_req','materials','class_size','assessment','work_load','diff_level')
+	list_display = ('restaurant','rating','user_name','prof_name','comment',
+		'pub_date','pre_req','materials','class_size',
+		'assessment','work_load','diff_level','get_users_reported','get_report_counts')
 	list_filter = ['pub_date','user_name','class_size','assessment','work_load','prof_name','diff_level']
 	search_fields = ['comment']
 
@@ -17,6 +21,17 @@ class ClusterAdmin(admin.ModelAdmin):
     model = Cluster
     list_display = ['name', 'get_members']
 
+# class UserProfileInline(admin.StackedInline):
+#     model = UserProfile
+#     can_delete = True
+#     verbose_name_plural = 'userprofile'
+
+# class UserAdmin(BaseUserAdmin):
+#     inlines = (UserProfileInline,)
+
+#admin.site.unregister(User)
+#admin.site.register(User, UserAdmin)
 admin.site.register(Restaurant,ReviewRestaurant)
 admin.site.register(Review,ReviewAdmin)
 admin.site.register(Cluster,ClusterAdmin)
+

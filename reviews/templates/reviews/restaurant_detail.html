@@ -7,39 +7,35 @@
 {% endblock %}
 
 {% block content %}
-<h3>Recent reviews</h3>
-
-{% if restaurant.review_set.all %}
+{% if restaurant_review_list %}
 <div class="row">
-    {% for review in restaurant.review_set.all %}
+    {% for review in restaurant_review_list %}
     <div class="col-xs-6 col-lg-4">
-        <em>{{ review.comment }}</em>
-        <h6>Recommended {{ review.rating }} of 5 by {{ review.user_name }}</h6>
-        <h6>It's a {{review.get_diff_level_display}} class by {{review.prof_name}}</h6>
-        <h5><a href="{% url 'reviews:review_detail' review.id %}">
-        Read more
-        </a></h5>
+        <h4>Recommended {{ review.rating }} of 5 by <a href="{% url 'reviews:user_review_list' review.user_name %}" >{{ review.user_name }}</a></h4>
+        <p>{{ review.comment }}</p>
+        <h6><a href="{% url 'reviews:review_detail' review.id %}">Read more </a><a onclick="return confirm('You will not see this review after reporting. Proceed?')" href="{% url 'reviews:report_review' review.id %}">&nbsp &nbsp Report</a></h6> 
     </div>
     {% endfor %}
 </div>
 {% else %}
-<p>No reviews for this restaurant yet</p>
+<p>No reviews are available.</p>
 {% endif %}
 
 <h3>Add your review</h3>
-{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>
+{% else %}
 <form action="{% url 'reviews:add_review' restaurant.id %}" method="post" class="form">
-    {% csrf_token %}
+{% csrf_token %}
 
-    {% for field in form %}
-        {% bootstrap_field field %}
-    {% endfor %}
-
-    {% buttons %}
-    <button type="submit" class="btn btn-primary">
-      {% bootstrap_icon "star" %} Add
-    </button>
-    {% endbuttons %}
+{% for field in form %}
+    {% bootstrap_field field %}
+{% endfor %}
+{% buttons %}
+<button type="submit" class="btn btn-primary">
+    {% bootstrap_icon "star" %} Add
+</button>
+{% endbuttons %}
 </form>
+{% endif %}
+
 {% endblock %}

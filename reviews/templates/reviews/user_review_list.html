@@ -1,5 +1,36 @@
-{% extends 'reviews/review_list.html' %}
+{% extends 'base.html' %}
 
 {% block title %}
 <h2>Reviews by {{ username }}</h2>
+{% endblock %}
+
+{% block content %}
+{% if latest_review_list %}
+<div class="row">
+    {% for review in latest_review_list %}
+    <div class="col-xs-6 col-lg-4">
+        <h4><a href="{% url 'reviews:review_detail' review.id %}">
+        {{review.restaurant.school}} {{ review.restaurant.name }}
+        </a></h4>
+        <h6>Recommended {{ review.rating }} of 5 by <a href="{% url 'reviews:user_review_list' review.user_name %}" >{{ review.user_name }}</a></h6>
+        <p>{{ review.comment }}</p>
+        {% if user.is_authenticated %}
+            {% if user.get_username == review.user_name %}
+            <h6><a href="{% url 'reviews:edit_review' review.id %}">
+            Edit
+            </a>
+            <a onclick="return confirm('Are you sure you want to delete this?')" href="{% url 'reviews:delete_review' review.id %}">
+            Delete
+            </a>
+            </h6>
+            {% else %}
+            {% endif %}
+        {% else %}
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p>No reviews are available.</p>
+{% endif %}
 {% endblock %}
