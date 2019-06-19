@@ -16,7 +16,7 @@
     {% for review in latest_review_list %}
     <div class="col-xs-6 col-lg-4">
         <h4><a href="{% url 'reviews:review_detail' review.id %}">
-        {{ review.restaurant.name }}
+        {{review.restaurant.school}} {{ review.restaurant.name }}
         </a></h4>
         <h6>Recommended {{ review.rating }} of 5 by <a href="{% url 'reviews:user_review_list' review.user_name %}" >{{ review.user_name }}</a></h6>
         <p>{{ review.comment }}</p>
