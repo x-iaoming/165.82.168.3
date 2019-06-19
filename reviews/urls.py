@@ -8,10 +8,10 @@ urlpatterns = [
     # ex: /review/5/
     url(r'^review/(?P<review_id>[0-9]+)/$', views.review_detail, name='review_detail'),
     # ex: /wine/
-    url(r'^restaurant$', views.restaurant_list, name='restaurant_list'),
+    url(r'^class$', views.restaurant_list, name='restaurant_list'),
     # ex: /wine/5/
-    url(r'^restaurant/(?P<restaurant_id>[0-9]+)/$', views.restaurant_detail, name='restaurant_detail'),
-    url(r'^restaurant/(?P<restaurant_id>[0-9]+)/add_review/$', views.add_review, name='add_review'),
+    url(r'^class/(?P<restaurant_id>[0-9]+)/$', views.restaurant_detail, name='restaurant_detail'),
+    url(r'^class/(?P<restaurant_id>[0-9]+)/add_review/$', views.add_review, name='add_review'),
     url(r'^review/user/(?P<username>\w+)/$', views.user_review_list, name='user_review_list'),
     url(r'^review/user/$', views.user_review_list, name='user_review_list'),
     url(r'^recommendation/$', views.user_recommendation_list, name='user_recommendation_list'),

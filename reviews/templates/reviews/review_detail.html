@@ -5,7 +5,14 @@
 {% endblock %}
 
 {% block content %}
-<h4>Rated {{ review.rating }} of 5 by <a href="{% url 'reviews:user_review_list' review.user_name %}" >{{ review.user_name }}</a></h4>
+<h4>Recommended {{ review.rating }} of 5 by <a href="{% url 'reviews:user_review_list' review.user_name %}" >{{ review.user_name }}</a></h4>
 <p>{{ review.pub_date }}</p>
+<p>Taught by: {{ review.prof_name }}</p>
+<p>Class size: {{ review.get_class_size_display }}</p>
+<p>Workload: {{ review.get_work_load_display }}</p>
+<p>Level of difficulty: {{ review.get_diff_level_display }}</p>
+<p>Type of assessment: {{ review.get_assessment_display }}</p>
+<p>Prerequisite: {{ review.pre_req }}</p>
+<p>Materials required: {{ review.materials }}</p>
 <p>{{ review.comment }}</p>
 {% endblock %}

@@ -15,7 +15,9 @@ def review_list(request):
 
 def review_detail(request,review_id):
     review = get_object_or_404(Review, pk=review_id)
-    return render(request,'reviews/review_detail.html',{'review':review})
+    context = {'review':review}
+    
+    return render(request,'reviews/review_detail.html',context)
 
 def restaurant_list(request):
     restaurant_list = Restaurant.objects.order_by('-name')
