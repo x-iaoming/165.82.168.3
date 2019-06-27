@@ -1,19 +1,32 @@
 {% extends 'base.html' %}
 {% load bootstrap3 %}
 
-
 {% block title %}
+<div align="center">
+<!--
 <h2>Login or <a href="/accounts/register">Register</a></h2>
+-->
+<h2>Welcome!</h2>
+</div>
 {% endblock %}
 
 {% block content %}
-<form action="{% url 'auth:login' %}" method="post" class="form">
+<div align="center">
+  <br>
+  <h3><a href="{% url 'social:begin' 'google-oauth2' %}"><strong>Sign up or Login with Google</strong></a></h3>
+  <!--
+  <p>-- OR --</p>
+  <form method="post">
     {% csrf_token %}
-    {% bootstrap_form form layout='inline' %}
+    {{ form.as_p }}
     {% buttons %}
     <button type="submit" class="btn btn-primary">
-      {% bootstrap_icon "user" %} Login
+    {% bootstrap_icon "user" %} Login
     </button>
     {% endbuttons %}
-</form>
+  </form>
+  -->
+  
+  
+</div>
 {% endblock %}

@@ -1,23 +1,65 @@
 {% extends 'base.html' %}
+{% load bootstrap3 %}
 
 {% block title %}
-<h2>Hi {{ username }}!</h2>
+<p>{{username}}</p>
 {% endblock %}
 
 {% block content %}
-<h3> My Departments </h3>
+
+{% for item in profile %}
+    <h4>College: {{ item.college }}</h4>
+    <h4>Graduation year: {{ item.year }}</h4>
+{% endfor %}
+
+{% if username == user.username %}
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>
+{% else %}
+<form action="{% url 'reviews:add_profile' username %}" method="post" class="form">
+{% csrf_token %}
+{% for field in form %}
+    {% bootstrap_field field %}
+{% endfor %}
+{% buttons %}
+<button type="submit" class="btn btn-primary">
+    Modify Profile
+</button>
+<a href="{% url 'auth:logout' %}"> Logout </a>
+{% endbuttons %}
+</form>
+{% endif %}
+{% else %}
+{% endif %}
+
+<h3> My Insiders Group </h3>
     {% if sub_dept_list %}
     <div class="row">
         {% for dept in sub_dept_list %}
         <div class="col-xs-6 col-lg-4">
         <h4><a href="{% url 'reviews:department_detail' dept.id %}">
-        {{dept.name}}</a></h4>
-        <h6>{{dept.sub_count}} Followers</h6>  
+        {{dept.college.name}} {{dept.name}}</a></h4>
+        <h6>{{dept.sub_count}} Insiders</h6>  
         </div>
         {% endfor %}
     </div>
     {% else %}
     <p>Explore departments to follow</p>
+    {% endif %}
+
+<h3>My Topics</h3>
+    {% if topic_list %}
+    <div class="row">
+        {% for topic in topic_list %}
+        <div class="col-xs-6 col-lg-4">
+        <h4>
+        <a href="{% url 'reviews:topic_detail' topic.id %}">{{ topic.title }}
+        </a></h4>
+        <h6>{{ topic.department.name }}</h6>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p>Start a topic in your departments!</p>
     {% endif %}
 
 <h3> My Reviews </h3>
@@ -42,34 +84,5 @@
     <p>No reviews are available.</p>
     {% endif %}
 
-<h3>My Topics</h3>
-    {% if topic_list %}
-    <div class="row">
-        {% for topic in topic_list %}
-        <div class="col-xs-6 col-lg-4">
-        <h4>
-        <a href="{% url 'reviews:topic_detail' topic.id %}">{{ topic.title }}
-        </a></h4>
-        <h6>{{ topic.department.name }}</h6>
-        </div>
-        {% endfor %}
-    </div>
-    {% else %}
-    <p>Start a topic in your departments!</p>
-    {% endif %}
-
-{% if error_message %}<p><strong>{{ error_message }}</strong></p>
-{% else %}
-<form action="{% url 'reviews:add_profile' username %}" method="post" class="form">
-{% csrf_token %}
-{% for field in form %}
-    {% bootstrap_field field %}
-{% endfor %}
-{% buttons %}
-<button type="submit" class="btn btn-primary">
-    {% bootstrap_icon "star" %} Start Topic
-</button>
-{% endbuttons %}
-</form>
-
 {% endblock %}
+

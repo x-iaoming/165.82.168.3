@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+
+{% block title %}
+<script type = "text/javascript" src = "//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js" ></script>
+{{ form.media.css }}
+<h2>Add a review / <a href="{% url 'reviews:find_review'%}"> Find class review</a></h2>
+{% endblock %}
+
+{% block content %}
+<form action="{% url 'reviews:add_general_review'%}" method="post" class="form">
+{% csrf_token %}
+{% for field in form %}
+    {% bootstrap_field field %}
+{% endfor %}
+{% buttons %}
+<button type="submit" class="btn btn-primary">
+    {% bootstrap_icon "star" %} Add
+</button>
+{% endbuttons %}
+</form>
+{{ form.media.js }}
+{% endblock %}
+

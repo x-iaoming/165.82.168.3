@@ -18,6 +18,7 @@ from django.conf.urls import url
 from django.urls import include
 from django.urls import path
 
+from django.contrib.auth import views
 # from django_registration.backends.activation.views import RegistrationView
 # from .regist_form import MyCustomUserForm
 
@@ -27,10 +28,15 @@ from django.urls import path
 # ]
 
 urlpatterns = [
-    path('accounts/',include('django_registration.backends.one_step.urls')),
+    url(r'^admin/', admin.site.urls),
+    url(r'^login/$', views.LoginView, name='login'),
+    url(r'^logout/$', views.LogoutView, name='logout'),
+    url(r'^auth/', include('social_django.urls', namespace='social')),  # <- Here
+    url(r'^select2/', include('django_select2.urls')),
+    path('accounts/',include('django_registration.backends.activation.urls')),
     path('accounts/',include(('django.contrib.auth.urls','django_registration'), namespace='auth')),
     path('', include(('reviews.urls','reviews'), namespace='reviews')),
-    path('admin/', admin.site.urls),
+    #path('admin/', admin.site.urls),
 ]
 
     # path('accounts/',include('django_registration.backends.one_step.urls')),

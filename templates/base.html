@@ -3,33 +3,25 @@
 {% bootstrap_javascript %}
 
 {% block bootstrap3_content %}
-<title>How's Class</title>
+<title>Department Insider</title>
 
 <div class="container">
     <nav class="navbar navbar-default">
         <div class="navbar-header">
-            <a class="navbar-brand" href="{% url 'reviews:review_list' %}">How's Class</a>
+            <a class="navbar-brand" href="{% url 'reviews:review_list' %}"><b>Department Insider</b></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-                </li>
-                <li><a href="{% url 'reviews:restaurant_list' %}">Find Class Reviews</a>
-            
-            {% if user.is_authenticated %}
-                <li><a href="{% url 'reviews:user_recommendation_list' %}">My Class Recommendations</a></li>
-            {% else %}
-                <li><a href="{% url 'auth:login' %}">Class Recommendations</a></li>
-            {% endif %}
+                <li><a href="{% url 'reviews:find_review' %}">Reviews</a></li>
+                <li><a href="{% url 'reviews:department_list_all' %}">Insiders</a></li>
             </ul> 
 
             <ul class="nav navbar-nav navbar-right">  
                 {% if user.is_authenticated %}
-                <li><a href="{% url 'reviews:user_review_list' user.username %}"> My Reivews </a></li>
-                <li><a href="{% url 'auth:logout' %}">Logout</a></li>
+                <li><a href="{% url 'reviews:user_profile' user.username %}">{{ user.username}}</a></li>
             </ul>
                 {% else %}
-                <li><a href="/accounts/register">Register</a></li>
-                <li><a href="{% url 'auth:login' %}">Login</a></li>
+                <li><a href="{% url 'auth:login' %}">Login/Sign Up</a></li>
                 {% endif %}
             
         </div>

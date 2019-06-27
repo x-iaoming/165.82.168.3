@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+
+
+{% block title %}
+<h2> {{ department.college.name }} {{ department.name }}</h2>
+<h5>{{ department.sub_count}} Insiders | You're an insider! <a href="{% url 'reviews:invite' department.id %}"> Invite</a> |
+<a href="{% url 'reviews:unsub_dept' department.id %}">Leave </a></h5>
+{% endblock %}
+
+
+
+{% block content %}
+
+<form action="{% url 'reviews:department_detail' department.id%}" method="post" class="form">
+{% csrf_token %}
+{% for field in form %}
+    {% bootstrap_field field %}
+{% endfor %}
+<button type="submit" class="btn btn-primary">
+    {% bootstrap_icon "star" %} Go
+</button>
+</form>
+
+<button onclick ="window.location.href = '{% url 'reviews:add_topic' department.id %}';">
+    {% bootstrap_icon "star" %} Add topic
+</button>
+
+<button onclick ="window.location.href = '{% url 'reviews:add_general_review'%}';">
+    {% bootstrap_icon "star" %} Add review
+</button>
+
+<h3>Latest Threads</h3>
+{% if result_list %}
+<div class="row">
+    {% for result in result_list %}
+    <div>
+        {% if result.is_review %}
+        <p><h4><a href="{% url 'reviews:restaurant_detail' result.restaurant.id %}">{{ result.user_name}} recommended {{ result.restaurant }} {{ result.rating }} of 5</a></h4>
+        {% else %}
+        <p><h4><a href="{% url 'reviews:topic_detail' result.id %}">{{ result.title }}</a></h4>
+        {% endif %}
+    {{ result.pub_date }}</p>
+    <br>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p>No thread is available.</p>
+{% endif %}
+
+{% endblock %}

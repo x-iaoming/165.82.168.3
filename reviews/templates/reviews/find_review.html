@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+
+{% block title %}
+<script type = "text/javascript" src = "//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js" ></script>
+{{ form.media.css }}
+<h2>Find class review / <a href="{% url 'reviews:add_general_review'%}"> Add a review </a></h2>
+{% endblock %}
+
+{% block content %}
+<form action="{% url 'reviews:find_review'%}" method="post" class="form">
+{% csrf_token %}
+{% for field in form %}
+    {% bootstrap_field field %}
+{% endfor %}
+{% buttons %}
+<button type="submit" class="btn btn-primary">
+    {% bootstrap_icon "star" %} Search
+</button>
+{% endbuttons %}
+</form>
+{{ form.media.js }}
+
+{% if class_list %}
+<h2>Classes at {{ department.name}}</h2>
+<div class="row">
+    {% for class in class_list %}
+    <div class="col-xs-6 col-lg-4">
+        <h3><a href="{% url 'reviews:restaurant_detail' class.id %}">
+        {{ class.name }}</a></h3>
+        <h5>Average rating: {{ class.average_rating | floatformat }}/5
+        <br>Average difficulty: {{ class.average_diff | floatformat }}/5
+        <br>Average workload: {{ class.average_wl | floatformat }} hours per week outside class</h5>
+        
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+{% endif %}
+
+{% if review_list %}
+<h2>Latest reviews</h2>
+<div class="row">
+    {% for review in review_list %}
+    <div class="col-xs-6 col-lg-4">
+        <h3><a href="{% url 'reviews:restaurant_detail' review.restaurant.id %}">
+        {{ review.restaurant }}</a></h3>
+        <h5>Rating: {{ review.rating | floatformat }}/5 by {{ review.user_name }}
+        <br>Difficulty: {{ review.diff_level | floatformat }}/5
+        <br>Workload: {{ review.work_load | floatformat }} hours per week outside class</h5> 
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+{% endif %}
+{% endblock %}
+

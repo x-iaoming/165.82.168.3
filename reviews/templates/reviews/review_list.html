@@ -10,21 +10,22 @@
     <div class="panel-body"><footer><a href="https://www.linkedin.com/in/ruiming100/">Ray (Ruiming) Li</a>: <a href="mailto:ruiming100@gmail.com?Subject=Hello%20Ray" target="_top">ruiming100@gmail.com</a><br>developed this sample web-based machine learning project.</footer><footer><br>He made use of nginx + uwsgi + django framework and K-Nearest Neighbor algorithm in sklearn package. He would like to give special thanks to server at Haverford College and step-by-step django tutorial by Jose A Dianes. Click register to give it a try ;)</footer></div>
 </div>
 -->
-<h2>Latest reviews</h2>
-{% if latest_review_list %}
+<h3>Latest Threads</h3>
+{% if result_list %}
 <div class="row">
-    {% for review in latest_review_list %}
-    <div class="col-xs-6 col-lg-4">
-        <h4><p>
-        {{review.restaurant.school}} {{ review.restaurant.name }}
-        </p></h4>
-        <h6>Recommended {{ review.rating }} of 5 by <a href="{% url 'reviews:user_review_list' review.user_name %}" >{{ review.user_name }}</a></h6>
-        <p>{{ review.comment }}</p>
-        <h6><a href="{% url 'reviews:review_detail' review.id %}">Read more </a><a onclick="return confirm('You will not see this review after reporting. Proceed?')" href="{% url 'reviews:report_review' review.id %}">&nbsp &nbsp Report</a></h6> 
+    {% for result in result_list %}
+    <div>
+        {% if result.is_review %}
+        <p><h4><a href="{% url 'reviews:restaurant_detail' result.restaurant.id %}">{{ result.user_name}} recommended {{ result.restaurant }} {{ result.rating }} of 5</a></h4>
+        {% else %}
+        <p><h4><a href="{% url 'reviews:topic_detail' result.id %}">{{ result.title }}</a></h4>
+        {% endif %}
+    {{ result.pub_date }}</p>
+    <br>
     </div>
     {% endfor %}
 </div>
 {% else %}
-<p>No reviews are available.</p>
+<p>No thread is available.</p>
 {% endif %}
 {% endblock %}

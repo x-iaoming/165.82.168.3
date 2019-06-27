@@ -1,0 +1,68 @@
+<h3>Class list</h3>
+{% if restaurant_list %}
+<div class="row">
+    {% for restaurant in restaurant_list %}
+    <div class="col-xs-6 col-lg-4">
+        <h4><a href="{% url 'reviews:restaurant_detail' restaurant.id %}">
+        {{ restaurant.name }}
+        </a></h4>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p>No class is available.</p>
+{% endif %}
+<br>
+
+<h3>Latest Review</h3>
+{% if restaurant_review_list %}
+<div class="row">
+    {% for review in restaurant_review_list %}
+    <div class="col-xs-6 col-lg-4">
+    	<h4><a href="{% url 'reviews:restaurant_detail' review.restaurant.id %}">
+        {{ review.restaurant }}</a> Recommended {{ review.rating }} of 5 
+        </h4>
+        <h6>{{ review.comment }}</h6>
+        <h6><a href="{% url 'reviews:review_detail' review.id %}">Detail</a></h6>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p>No review is available.</p>
+{% endif %}
+
+
+
+<br>
+<h3>Latest Topic</h3>
+{% if topic_list %}
+<div class="row">
+    {% for topic in topic_list %}
+    <div class="col-xs-6 col-lg-4">
+        <h4><a>
+        <a href="{% url 'reviews:topic_detail' topic.id %}">{{ topic.title }}</a>
+        </a></h4>
+        <h6>{{ topic.content }}</h6>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p>No topic is available.</p>
+{% endif %}
+
+
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>
+{% else %}
+<form action="{% url 'reviews:add_topic' department.id %}" method="post" class="form">
+{% csrf_token %}
+{% for field in form %}
+    {% bootstrap_field field %}
+{% endfor %}
+{% buttons %}
+<button type="submit" class="btn btn-primary">
+    {% bootstrap_icon "star" %} Start Topic
+</button>
+{% endbuttons %}
+</form>
+{% endif %}

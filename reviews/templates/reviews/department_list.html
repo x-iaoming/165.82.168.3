@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+
+{% block title %}
+<script type = "text/javascript" src = "//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js" ></script>
+{{ form.media.css }}
+{% endblock %}
+
+{% block content %}
+
+<h2> My Insiders Groups </h2>
+    {% if sub_dept_list %}
+    <div class="row">
+        {% for dept in sub_dept_list %}
+        <div class="col-xs-6 col-lg-4">
+        <h4><a href="{% url 'reviews:department_detail' dept.id %}">
+        {{dept.college.name}} {{dept.name}}</a></h4>
+        <h6>{{dept.sub_count}} Insiders</h6>  
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    {% endif %}
+
+{% if user.is_authenticated == False %}
+<h4>We don't know you yet! <a href="{% url 'auth:login' %}">Sign in</a> to see all insider groups at your college right away.</h4>
+{% else %}
+{% endif %}
+
+<h2> Find Insiders Groups </h2>
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>
+{% else %}
+<form action="{% url 'reviews:department_list_all'%}" method="post" class="form">
+{% csrf_token %}
+{% for field in form %}
+    {% bootstrap_field field %}
+{% endfor %}
+{% buttons %}
+<button type="submit" class="btn btn-primary">
+    {% bootstrap_icon "star" %} Go
+</button>
+{% endbuttons %}
+
+</form>
+{% endif %}
+
+{% if department_list %}
+<h2>{{college.name}} Insiders Group</h2>
+<div class="row">
+    {% for department in department_list %}
+    <div class="col-xs-6 col-lg-4">
+        <h4><a href="{% url 'reviews:department_detail' department.id %}">
+        {{ department.name }}
+        </a></h4>
+        <h5>{{ department.sub_count}} insiders</h5>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+{% if user.is_authenticated == False %}
+{% else %}
+<h2>We don't know your college yet! <a href="{% url 'reviews:user_profile' %}">Complete your profile</a> to see all insider groups at your college right away.</h2>
+{% endif %}
+{% endif %}
+
+
+{{ form.media.js }}
+{% endblock %}

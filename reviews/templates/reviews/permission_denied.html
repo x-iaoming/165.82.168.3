@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+
+
+{% block title %}
+<h2>Uhh Ohh...You're not an insider of this department yet!</h2>
+{% endblock %}
+
+{% block content %}
+<h3>Wanna be an insider?</h3>
+<h4><a href="{% url 'reviews:find_review'%}">Take a class</a> in the department and <a href="{% url 'reviews:add_general_review'%}">review your class</a> in this department</h4>
+<h4>Or ask an insider to invite you!</h4>
+{% endblock %}

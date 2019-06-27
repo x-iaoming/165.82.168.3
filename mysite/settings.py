@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     'reviews',
     'bootstrap3',
     'django_registration',
+    'social_django',
+    'django_select2',
 ]
 
 MIDDLEWARE = [
@@ -70,6 +72,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'social_django.context_processors.backends',  # <- Here
+                'social_django.context_processors.login_redirect',
             ],
         },
     },
@@ -126,6 +130,19 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
-LOGIN_REDIRECT_URL = '/review/user/'
+LOGIN_REDIRECT_URL = '/user/'
 ACCOUNT_ACTIVATION_DAYS = 7 # One-week activation window
 REGISTRATION_AUTO_LOGIN = True # Automatically log the user in.
+
+LOGIN_URL = 'login'
+AUTHENTICATION_BACKENDS = (
+     'social_core.backends.open_id.OpenIdAuth',  # for Google authentication
+     'social_core.backends.google.GoogleOpenId',  # for Google authentication
+     'social_core.backends.google.GoogleOAuth2',  # for Google authentication
+     #'social_core.backends.github.GithubOAuth2',  # for Github authentication
+     #'social_core.backends.facebook.FacebookOAuth2',  # for Facebook authentication 
+     'django.contrib.auth.backends.ModelBackend',
+)
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY ='926144730185-nh9uk262qcbloqoo8kmr5u21h9olr3d8.apps.googleusercontent.com'  #Paste CLient Key
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'VGD8SkJ-3-5yU2ckW-Uy09aP' #Paste Secret Key
