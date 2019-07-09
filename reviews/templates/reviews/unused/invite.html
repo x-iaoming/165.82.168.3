@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
+{% load bootstrap4 %}
 
 {% block title %}
 <h3>Invite your friends to {{ department.college.name }} {{ department.name }}</h3> 
@@ -13,7 +13,7 @@
 {% endfor %}
 {% buttons %}
 <button type="submit" class="btn btn-primary">
-    {% bootstrap_icon "star" %} Invite
+     Invite
 </button>
 {% endbuttons %}
 </form>

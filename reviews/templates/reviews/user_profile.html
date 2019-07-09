@@ -1,88 +1,120 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
+{% load bootstrap4 %}
 
 {% block title %}
-<p>{{username}}</p>
 {% endblock %}
 
 {% block content %}
-
-{% for item in profile %}
-    <h4>College: {{ item.college }}</h4>
-    <h4>Graduation year: {{ item.year }}</h4>
-{% endfor %}
-
-{% if username == user.username %}
-{% if error_message %}<p><strong>{{ error_message }}</strong></p>
-{% else %}
-<form action="{% url 'reviews:add_profile' username %}" method="post" class="form">
-{% csrf_token %}
-{% for field in form %}
-    {% bootstrap_field field %}
-{% endfor %}
-{% buttons %}
-<button type="submit" class="btn btn-primary">
-    Modify Profile
-</button>
-<a href="{% url 'auth:logout' %}"> Logout </a>
-{% endbuttons %}
-</form>
-{% endif %}
-{% else %}
-{% endif %}
-
-<h3> My Insiders Group </h3>
-    {% if sub_dept_list %}
-    <div class="row">
-        {% for dept in sub_dept_list %}
-        <div class="col-xs-6 col-lg-4">
-        <h4><a href="{% url 'reviews:department_detail' dept.id %}">
-        {{dept.college.name}} {{dept.name}}</a></h4>
-        <h6>{{dept.sub_count}} Insiders</h6>  
-        </div>
+<div class="row">
+  <div class="col-md-3" >
+    <div class="card">
+      <div class="card-header text-primary">
+        {% if profile %}
+        <h3>{{ profile.username }}</h3>
+        {% else %}
+        <h3>Add/Change Profile</h3>
+        {% endif %}
+      </div>
+    <div class="card-body">
+      {% if profile %}
+      <h5>College: {{ profile.college }}</h5>
+      <h5>Graduation year: {{ profile.year }}</h5>
+      {% else %}
+      {% endif %}
+    {% if user_viewed == user %}
+      {% if error_message %}<p><strong>{{ error_message }}</strong></p>
+      {% else %}
+        <form action="{% url 'reviews:add_profile' user.id %}" method="post" class="form">
+        {% csrf_token %}
+        {% for field in form %}
+        {% bootstrap_field field %}
         {% endfor %}
+        {% buttons %}
+        <button type="submit" class="btn btn-raised btn-primary">
+          Edit Profile
+        </button>
+        <a href="{% url 'auth:logout' %}"> Logout </a>
+        {% endbuttons %}
+        </form>
+      {% endif %}
+    {% else %}
+    {% endif %}
+    </div>
+    </div>
+    <p></p>
+  </div>
+
+
+  <div class="col-md-9">
+    <div class="card">
+      <div class="card-header">
+        <h3> {{profile.username}}'s Insiders Group </h3>
+      </div>
+      <div class="card-body">
+        {% if sub_dept_list %}
+          <div class="row">
+            {% for dept in sub_dept_list %}
+              <div class="col-xs-6 col-lg-4">
+                <h4><a href="{% url 'reviews:department_list' dept.id %}">
+                {{dept.college.name}} {{dept.name}}</a></h4>
+                <h6>{{dept.sub_count}} Insiders</h6>  
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p><a href="{% url 'reviews:review_list'%}"><u>Explore departments</u></a> to follow ~(˘▾˘~)</p>
+        {% endif %}
+       </div>
+    <div class="card-header">
+       <h3>{{profile.username}}'s Topics</h3>
+    </div>
+    {% if user_viewed == user %}
+    <div class="card-body">
+      {% if topic_list %}
+        <div class="row">
+          {% for topic in topic_list %}
+            <div class="col-xs-6 col-lg-4">
+            <h4><a href="{% url 'reviews:topic_detail' topic.id %}">{{ topic.title }}
+            </a></h4>
+            <h6>{{ topic.department.name }}</h6>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+          <p>Start a topic in your insider groups! (´・ω・`)</p>
+      {% endif %}
     </div>
     {% else %}
-    <p>Explore departments to follow</p>
     {% endif %}
-
-<h3>My Topics</h3>
-    {% if topic_list %}
-    <div class="row">
-        {% for topic in topic_list %}
-        <div class="col-xs-6 col-lg-4">
-        <h4>
-        <a href="{% url 'reviews:topic_detail' topic.id %}">{{ topic.title }}
-        </a></h4>
-        <h6>{{ topic.department.name }}</h6>
-        </div>
-        {% endfor %}
+    <div class="card-header">
+      <h3> {{profile.username}}'s Feedbacks </h3>
     </div>
-    {% else %}
-    <p>Start a topic in your departments!</p>
-    {% endif %}
-
-<h3> My Reviews </h3>
-    {% if latest_review_list %}
-    <div class="row">
-        {% for review in latest_review_list %}
-        <div class="col-xs-6 col-lg-4">
-        <h4><a href="{% url 'reviews:review_detail' review.id %}"> Recommended {{review.restaurant.school}} {{ review.restaurant.name }} {{ review.rating }} of 5</a></h4>
-        <h6><p>{{ review.comment }}</p></h6>
+    <div class="card-body">
+    {% if user_viewed == user %}
+      {% if latest_review_list %}
+        <div class="row">
+          {% for review in latest_review_list %}
+          <div class="col-xs-6 col-lg-4">
+          <h4><a href="{% url 'reviews:review_detail' review.id %}"> Recommended {{review.restaurant.school}} {{ review.restaurant.name }} {{ review.rating }} of 5</a></h4>
+          <h6><p>{{ review.comment }}</p></h6>
             {% if user.is_authenticated %}
-                {% if user.get_username == review.user_name %}
+                {% if user_viewed == user %}
                 <h6>{{ review.get_like_counts }} Likes &nbsp &nbsp
                 </h6>
                 {% else %}
                 {% endif %}
             {% else %}
             {% endif %}
+          </div>
+          {% endfor %}
         </div>
-        {% endfor %}
-    </div>
+      {% else %}
+        <p><a href="{% url 'reviews:add_general_review'%}"><u>Write some feedbacks</u></a> for the classes you've taken ☜(˚▽˚)☞</p>
+      {% endif %}
     {% else %}
-    <p>No reviews are available.</p>
     {% endif %}
+    </div>
+    </div>
 
 {% endblock %}
 

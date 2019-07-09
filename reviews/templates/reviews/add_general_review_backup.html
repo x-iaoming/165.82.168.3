@@ -1,0 +1,31 @@
+<!--
+<form action="{% url 'reviews:add_general_review'%}" method="post" class="form" enctype="multipart/form-data">
+{% csrf_token %}
+{{ form.non_field_errors }}
+<div class="fieldWrapper">
+	{{ form.college.errors }}
+	<div class="row">
+		<div class="col-md-4" >
+    {% bootstrap_field form.college %}
+    {% bootstrap_field form.department %}
+    {% bootstrap_field form.restaurant %}
+    {% bootstrap_field form.prof_name %}
+    {% bootstrap_field form.diff_level %}
+    {% bootstrap_field form.work_load %}
+    {% bootstrap_field form.assessment %}
+    {% bootstrap_field form.syllabus %}
+        </div>
+        <div class="col-md-8" >
+	{% bootstrap_field form.title %}
+	{% bootstrap_field form.name %}
+	{% bootstrap_field form.comment %}
+		</div>
+    </div>
+</div>
+{% buttons %}
+<button type="submit" class="btn btn-raised btn-primary">
+     Add
+</button>
+{% endbuttons %}
+</form>
+-->

@@ -1,68 +1,296 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
+{% load bootstrap4 %}
 
 {% block title %}
 <script type = "text/javascript" src = "//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js" ></script>
+
 {{ form.media.css }}
 {% endblock %}
 
 {% block content %}
 
-<h2> My Insiders Groups </h2>
-    {% if sub_dept_list %}
-    <div class="row">
-        {% for dept in sub_dept_list %}
-        <div class="col-xs-6 col-lg-4">
-        <h4><a href="{% url 'reviews:department_detail' dept.id %}">
-        {{dept.college.name}} {{dept.name}}</a></h4>
-        <h6>{{dept.sub_count}} Insiders</h6>  
-        </div>
-        {% endfor %}
-    </div>
-    {% else %}
-    {% endif %}
-
-{% if user.is_authenticated == False %}
-<h4>We don't know you yet! <a href="{% url 'auth:login' %}">Sign in</a> to see all insider groups at your college right away.</h4>
-{% else %}
-{% endif %}
-
-<h2> Find Insiders Groups </h2>
-{% if error_message %}<p><strong>{{ error_message }}</strong></p>
-{% else %}
-<form action="{% url 'reviews:department_list_all'%}" method="post" class="form">
-{% csrf_token %}
-{% for field in form %}
-    {% bootstrap_field field %}
-{% endfor %}
-{% buttons %}
-<button type="submit" class="btn btn-primary">
-    {% bootstrap_icon "star" %} Go
-</button>
-{% endbuttons %}
-
-</form>
-{% endif %}
-
-{% if department_list %}
-<h2>{{college.name}} Insiders Group</h2>
 <div class="row">
-    {% for department in department_list %}
-    <div class="col-xs-6 col-lg-4">
-        <h4><a href="{% url 'reviews:department_detail' department.id %}">
-        {{ department.name }}
-        </a></h4>
-        <h5>{{ department.sub_count}} insiders</h5>
+  <div class="col-md-3" >
+
+{% if sub_list %}
+<div id="accordion">
+  <div class="card d-none d-sm-none d-md-block d-lg-block">
+    <div class="card-header" id="headingOne">
+      <h5 class="mb-0">
+        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne"> Class Feedback ▾
+        </button>
+        <a href="{% url 'reviews:add_review' department.id %}"><h5 class='text-white'><span class="badge badge-pill badge-primary">+ Add </span></h5></a>
+      </h5>
+    </div>
+    <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
+      <div class="card-body">
+        <!--
+        <a href="{% url 'reviews:add_review' department.id %}"><h5 class='text-white'><span class="badge badge-pill badge-primary">+ Add Class Feedback</span></h5></a>
+      -->
+      	<ul class="list-group list-group-flush">
+  	      {% for class in class_list %}
+            <li class="list-group-item"><a href="{% url 'reviews:restaurant_detail' class.id%}">{{ class.name }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+  
+
+  
+
+<p></p>
+</div>
+  
+{% else %}
+{% endif %}
+<div class="card d-none d-sm-none d-md-block d-lg-block">
+    <div class="card-header" id="headingFour">
+      <h5 class="mb-0">
+        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseFour" aria-expanded="false" aria-controls="collapseOne"> My Departments ▾
+        </button>
+        <a href="{% url 'reviews:review_list'%}"><h5 class='text-white'><span class="badge badge-pill badge-primary">+ Explore </span></h5></a>
+      </h5>
+    </div>
+    <div id="collapseFour" class="collapse show" aria-labelledby="headingFour" data-parent="#accordion">
+      <div class="card-body">
+        <ul class="list-group list-group-flush">
+          {% if user.is_authenticated %}
+          {% if sub_dept_list %}
+          {% for sub in sub_dept_list %}
+            <li class="list-group-item"><a href="{% url 'reviews:department_list' sub.id%}">{{ sub.name }}</a></li>
+          {% endfor %}
+          {% else %}
+          {% endif %}
+          {% else %}
+            <a>Please login</a>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!--
+  <div class="card d-none d-sm-none d-md-block d-lg-block">
+    <div class="card-header" id="headingThree">
+      <h5 class="mb-0">
+        <button class="btn btn-primary collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+          Explore more ▾
+        </button>
+      </h5>
+    </div>
+
+    <div id="collapseThree" class="collapse show" aria-labelledby="headingThree" data-parent="#accordion">
+      <div class="card-body">
+        {% if error_message %}<p><strong>{{ error_message }}</strong></p>
+        {% else %}
+          <form action="{% url 'reviews:department_list_all'%}" method="post" class="form">
+          {% csrf_token %}
+          {% for field in form %}
+          {% bootstrap_field field %}
+          {% endfor %}
+          {% buttons %}
+          <button type="submit" class="btn btn-raised btn-primary" >
+          Go
+          </button>
+          {% endbuttons %}
+          </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+-->
+
+</div>
+
+
+
+  <div class="col-md-9">
+
+
+
+{% if latest_topic_list %}
+<!--
+<div align="left">
+<h2>Latest Topics</h2>
+</div>
+
+    <div class="row" >
+    {% for topic in latest_topic_list %}
+    <div class="col-lg-6">
+    <div class="card">
+
+
+      <div class="card-header"><strong>
+      	<div class="d-flex justify-content-between text-primary">
+      	<div>
+      {{ topic.department.college.name }} {{ topic.department.name }}
+        </div>
+        <div>
+       <a href="{% url 'reviews:department_list' topic.department.id %}" class="text-secondary">
+       	+ Join
+       </a>
+       </div>
+       </div>
+      </div></strong>
+
+
+      <div class="card-body">
+        <h5 class="card-title"><p class="capitalize">{{ topic.title }}</p></h5>
+        <h6 class="card-subtitle mb-2 text-muted"></h6>
+        <p class="card-text text-muted">{{ topic.pub_date }}</p>
+        <a href="{% url 'reviews:topic_detail' topic.id %}" class="card-link">Detail</a>
+        <a href="{% url 'reviews:like_topic' topic.id %}" class="card-link">Like {{ topic.get_like_counts }}</a>
+      </div>
+    </div>
+    <br>
+    </div>
+    
+    {% endfor %}
+    </div>
+-->
+{% else %}
+
+<div class="card">
+<div class="card-header">
+<div class="d-flex justify-content-between text-primary">
+	<div>
+<h2>{{department.college.name}} {{department.name}} Insiders</h2>
+    </div>
+    
+{% if sub %}
+<a href="{% url 'reviews:unsub_dept' department.id %}"><h6 class='text-secondary'>Leave</h6></a>
+{% else %}
+<a href="{% url 'reviews:sub_dept' department.id %}"><h4 class='text-white'><span class="badge badge-pill badge-primary">+ Join</span></h4></a>
+{% endif %}
+</div>
+</div>
+{% if sub %}
+<div class="card-body">
+<h5 class="card-subtitle mb-2 text-muted">
+	You're an insider! | {{department.sub.count}} Insiders<button class="btn btn-secondary" type="button" data-toggle="collapse" data-target="#collapse2" aria-expanded="false" aria-controls="collapse2">▾</button></h5>
+  
+    <div id="collapse2" class="collapse" aria-labelledby="headingTwo">
+      <div class="card-body">
+        <ul class="list-group list-group-flush">
+          {% for sub in sub_list %}
+            <li class="list-group-item"><a href="{% url 'reviews:user_profile' sub.id%}"> {{ sub.profile.username }} {{ sub.profile.year }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+
+<p class="card-text">
+<p><strong>  {{ department.tagline }} </strong></p>
+
+Thank you for being part of {{ department.college.name}} {{ department.name}}! We sincerely hope for your contribution towards this community by sharing your experiences and stories, responding to and connecting with other memebers, and simply asking any questions you have in mind! 
+<br>
+You can choose to be anonymous when posting. ALL post contents are visible to {{ department.college.name}} {{ department.name}} insiders only.
+<p>
+</div>
+</div>
+
+<div class="card d-block d-sm-block d-md-none d-lg-none">
+    <div class="card-header" id="headingOne">
+      <h5 class="mb-0">
+        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapse1" aria-expanded="false" aria-controls="collapse1"> Class Feedback ▾
+        </button>
+        <a href="{% url 'reviews:add_review' department.id %}"><h5 class='text-white'><span class="badge badge-pill badge-primary">+ Add </span></h5></a>
+      </h5>
+    </div>
+    <div id="collapse1" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
+      <div class="card-body">
+        <ul class="list-group list-group-flush">
+          {% for class in class_list %}
+            <li class="list-group-item"><a href="{% url 'reviews:restaurant_detail' class.id%}">{{ class.name }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+
+<p></p>
+
+<div class="card">
+<div class="card-header">
+<div class="d-flex justify-content-between text-primary">
+<div>
+<h2>Insider Threads</h2>
+</div>
+<div>
+<a href="{% url 'reviews:add_topic' department.id %}"><h5 class='text-white'><span class="badge badge-pill badge-primary">+ Add</span></h5></a>
+
+</div>
+</div>
+</div>
+
+<div class>
+    {% if result_list %}
+    {% for result in result_list %}
+    <div class="card">
+    	<div class="card-body">
+        {% if result.is_review %}
+          <h5 class="text-primary"> {{ result.title }} </h5>
+              <div class="text-secondary">{{ result.user_name }}; {{ result.pub_date }}</div>
+            <strong>{{ result.comment }}</strong>
+            <div id="count{{ result.id }}">
+            <div id="count{{ result.id }}">
+            <input type="button" class="btn btn-primary" id="like{{ result.id }}" value="Like | {{ result.get_like_counts }}" name="{{ result.id }}" />
+            <a onclick="return confirm('You will not see this review after reporting. Proceed?')" href="{% url 'reviews:report_review' result.id %}">&nbsp &nbsp Report</a>
+  </div>   
+
+<script>
+$('#like{{ result.id }}').on("click",function(){
+      $.ajax({
+               type: "POST",
+               url: "{% url 'reviews:like_review' %}",
+               data: {'review_id': $(this).attr('name'), 'csrfmiddlewaretoken': '{{ csrf_token }}'},
+               dataType: "json",
+               success: function() {
+                $("#count{{ result.id }}").load(window.location.href + " #count{{ result.id }}");
+                },
+               error: function(rs, e) {
+                    alert(rs.responseText);
+                }
+          }); 
+      
+    })
+</script>
+        {% else %}
+          <h5 class="text-primary"> {{ result.title }} </h5>
+              <div class="text-secondary">{{ result.username }}; {{ result.pub_date }}</div>
+              <strong>{{ result.content }}</strong>
+            <br><br><a href="{% url 'reviews:like_topic' result.id %}">Respond {{ result.response_set.count }}</a><a href="{% url 'reviews:like_topic' result.id %}">&nbsp &nbsp Like {{ result.get_like_counts }}</a><a onclick="return confirm('You will not see this review after reporting. Proceed?')" href="{% url 'reviews:report_topic' result.id %}">&nbsp &nbsp Report</a>
+        {% endif %}
+      </div>
     </div>
     {% endfor %}
+    {% else %}
+    <div class="container">
+      <br>
+      <h3>Please help us by adding more reviews and topics for this department</h3> 
+      (づ｡◕‿‿◕｡)づ
+    </div>
+    <br>
+    {% endif %}
 </div>
 {% else %}
-{% if user.is_authenticated == False %}
-{% else %}
-<h2>We don't know your college yet! <a href="{% url 'reviews:user_profile' %}">Complete your profile</a> to see all insider groups at your college right away.</h2>
+<div class="card-body">
+<h5 class="card-subtitle mb-2 text-muted">{{department.sub.count}} Insiders | You're NOT an insider yet.</h5>
+<p class="card-text">
+The {{ department.college.name}} {{ department.name}} community is for any current students, alumns, and prospective students to <strong>freely and honestly discuss topics related to {{ department.name}} and share their experiences and resources.</strong>
+<p>
+</div>
+</div>
 {% endif %}
 {% endif %}
 
 
+
+
+
+
+    </div>
+</div>
 {{ form.media.js }}
 {% endblock %}

@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
+{% load bootstrap4 %}
 
 {% block title %}
 <h2><a href="{% url 'reviews:restaurant_detail' review.restaurant.id %}">{{ review.restaurant.name }}</a></h2>
 {% endblock %}
 
 {% block content %}
-<h4>Recommended {{ review.rating }} of 5 by <a href="{% url 'reviews:user_profile' review.user_name %}" >{{ review.user_name }}</a></h4>
+<h4>Recommended {{ review.rating }} of 5 by {{ review.user_name }}</a></h4>
 <p>{{ review.pub_date }}</p>
 <p>Taught by: {{ review.prof_name }}</p>
-<p>Class size: {{ review.get_class_size_display }}</p>
 <p>Workload: {{ review.get_work_load_display }}</p>
 <p>Level of difficulty: {{ review.get_diff_level_display }}</p>
 <p>Type of assessment: {{ review.get_assessment_display }}</p>

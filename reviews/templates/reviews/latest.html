@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+
+
+{% block title %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-3" >
+  	<div class="d-none d-sm-none d-md-block d-lg-block">
+  	<div class="card">
+      <div class="card-header" id="headingFour">
+        <h5 class="mb-0">
+        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseFour" aria-expanded="false" aria-controls="collapseOne"> My Departments ▾
+        </button>
+        <a href="{% url 'reviews:review_list'%}"><h5 class='text-white'><span class="badge badge-pill badge-primary">+ Explore </span></h5></a>
+        </h5>
+      </div>
+      <div id="collapseFour" class="collapse show" aria-labelledby="headingFour" data-parent="#accordion">
+        <div class="card-body">
+          <ul class="list-group list-group-flush">
+          {% if user.is_authenticated %}
+          {% if sub_dept_list %}
+          {% for sub in sub_dept_list %}
+            <li class="list-group-item"><a class="text-secondary" href="{% url 'reviews:department_list' sub.id%}">{{ sub.college.name }} {{ sub.name }}</a></li>
+          {% endfor %}
+          {% else %}
+          {% endif %}
+          {% else %}
+            <p><a href="{% url 'auth:login' %}" class="text-secondary">Please <u>login</u> to get updates specific for you ʕ•ᴥ•ʔ</a></p>
+          {% endif %}
+        </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+    <div class="card-header" id="headingThree">
+      <h5 class="mb-0">
+        <button class="btn btn-primary collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+          My Class Feedback ▾
+        </button>
+        <a href="{% url 'reviews:add_general_review'%}"><h5 class='text-white'><span class="badge badge-pill badge-primary">+ Add </span></h5></a>
+      </h5>
+    </div>
+
+    <div id="collapseThree" class="collapse show" aria-labelledby="headingThree" data-parent="#accordion">
+      <div class="card-body">
+        {% if user_review_list %}
+          {% for review in user_review_list %}
+            <li class="list-group-item"><a class="text-secondary" href="{% url 'reviews:review_detail' review.id%}">{{ review.restaurant.name }} |  {{review.rating}} / 5 </a></li>
+          {% endfor %}
+          {% else %}
+          {% endif %}
+      </div>
+    </div>
+  </div>
+  </div>
+<!-- I don't want to repeat but right now I'm leaving it like this -->
+  <div class="d-block d-sm-block d-md-none d-lg-none">
+  	<div class="card">
+      <div class="card-header" id="headingFour">
+        <h5 class="mb-0">
+        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapse4" aria-expanded="false" aria-controls="collapseOne"> My Departments ▾
+        </button>
+        <a href="{% url 'reviews:review_list'%}"><h5 class='text-white'><span class="badge badge-pill badge-primary">+ Explore </span></h5></a>
+        </h5>
+      </div>
+      <div id="collapse4" class="collapse" aria-labelledby="headingFour" data-parent="#accordion">
+        <div class="card-body">
+          <ul class="list-group list-group-flush">
+          {% if user.is_authenticated %}
+          {% if sub_dept_list %}
+          {% for sub in sub_dept_list %}
+            <li class="list-group-item"><a class="text-secondary" href="{% url 'reviews:department_list' sub.id%}">{{ sub.college.name }} {{ sub.name }}</a></li>
+          {% endfor %}
+          {% else %}
+          {% endif %}
+          {% else %}
+            <p><a href="{% url 'auth:login' %}">Please <u>login</u> to get updates specific for you ʕ•ᴥ•ʔ</a></p>
+          {% endif %}
+        </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+    <div class="card-header" id="headingThree">
+      <h5 class="mb-0">
+        <button class="btn btn-primary collapsed" data-toggle="collapse" data-target="#collapse3" aria-expanded="false" aria-controls="collapseThree">
+          My Class Feedback ▾
+        </button>
+        <a href="{% url 'reviews:add_general_review'%}"><h5 class='text-white'><span class="badge badge-pill badge-primary">+ Add </span></h5></a>
+      </h5>
+    </div>
+
+    <div id="collapse3" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
+      <div class="card-body">
+        {% if user_review_list %}
+          {% for review in user_review_list %}
+            <li class="list-group-item"><a class="text-secondary" href="{% url 'reviews:review_detail' review.id%}">{{ review.restaurant.name }} |  {{review.rating}} / 5 </a></li>
+          {% endfor %}
+          {% else %}
+          {% endif %}
+      </div>
+    </div>
+  </div>
+  </div>
+
+<!-- I don't want to repeat but right now I'm leaving it like this -->
+
+    <p></p>
+  </div>
+
+  <div class="col-md-9">
+  	<div class="bg-white">
+      <div class="card-header">
+      	<h2>Latest Threads in Your Departments</h2>
+      </div>
+      {% for result in result_list %}
+      <div class="card">
+        {% if result.is_review %}
+          <div class="card-header">
+    	    <a class="text-secondary" href="{% url 'reviews:department_list' result.restaurant.department.id %}">{{ result.restaurant.department.college.name }} {{ result.restaurant.department.name }} >></a>
+          </div>
+          <div class="card-body">
+            {% if user.is_authenticated %}
+              <h5 class="text-primary"> {{ result.title }} </h5>
+              <div class="text-secondary">{{ result.user_name }}; {{ result.pub_date }}</div>
+            <strong>{{ result.comment }}</strong>
+
+
+
+<!-- Testing -->
+  <div id="count{{ result.id }}">
+            <input type="button" class="btn btn-primary" id="like{{ result.id }}" value="Like | {{ result.get_like_counts }}" name="{{ result.id }}" />
+            <a onclick="return confirm('You will not see this review after reporting. Proceed?')" href="{% url 'reviews:report_review' result.id %}">&nbsp &nbsp Report</a>
+  </div>   
+
+<script>
+$('#like{{ result.id }}').on("click",function(){
+      $.ajax({
+               type: "POST",
+               url: "{% url 'reviews:like_review' %}",
+               data: {'review_id': $(this).attr('name'), 'csrfmiddlewaretoken': '{{ csrf_token }}'},
+               dataType: "json",
+               success: function() {
+               	$("#count{{ result.id }}").load(window.location.href + " #count{{ result.id }}");
+                },
+               error: function(rs, e) {
+                    alert(rs.responseText);
+                }
+          }); 
+      
+    })
+</script>
+
+<!-- Testing -->
+
+            {% else %}
+              {{ result.title }}
+              <br><div class="text-secondary">Details hidden. Login to view.</div>
+            {% endif %}
+          </div>
+        {% else %}
+          <div class="card-header">
+            <a class="text-secondary" href="{% url 'reviews:department_list' result.department.id %}">{{ result.department.college.name }} {{ result.department.name }} >></a>
+          </div>
+          <div class="card-body">
+          {% if user.is_authenticated %}
+            <h5 class="text-primary"> {{ result.title }} </h5>
+              <div class="text-secondary">{{ result.username }}; {{ result.pub_date }}</div>
+              <strong>{{ result.content }}</strong>
+            <br><br><a href="{% url 'reviews:like_topic' result.id %}">Respond {{ result.response_set.count }}</a><a href="{% url 'reviews:like_topic' result.id %}">&nbsp &nbspLike {{ result.get_like_counts }}</a><a onclick="return confirm('You will not see this review after reporting. Proceed?')" href="{% url 'reviews:report_topic' result.id %}">&nbsp &nbsp Report</a>
+          {% else %}
+          {{ result.title }}
+          <br><div class="text-secondary">Details hidden. Login to view.</div>
+    {% endif %}
+    </div>
+{% endif %}
+</div>
+{% endfor %}
+
+<div class="card">
+  <div class="card-body text-secondary">
+    <div class="pagination">
+    <span class="step-links">
+        {% if result_list.has_previous %}
+            <a href="?page=1">&laquo; First&nbsp</a>
+            <a href="?page={{ result_list.previous_page_number }}">Previous&nbsp</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ result_list.number }} of {{ result_list.paginator.num_pages }}.
+        </span>
+
+        {% if result_list.has_next %}
+            <a href="?page={{ result_list.next_page_number }}">&nbspNext</a>
+            <a href="?page={{ result_list.paginator.num_pages }}">&nbspLast &raquo;</a>
+        {% endif %}
+    </span>
+    </div>
+  </div>
+</div>
+</div>
+{% endblock %}

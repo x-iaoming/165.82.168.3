@@ -1,0 +1,56 @@
+{% load bootstrap4 %}
+{% bootstrap_javascript %}
+
+<head>
+	<link rel="stylesheet" href="https://unpkg.com/bootstrap-material-design@4.1.1/dist/css/bootstrap-material-design.min.css" integrity="sha384-wXznGJNEXNG1NFsbm0ugrLFMQPWswR3lds2VeinahP8N0zJw9VWSopbjv2x7WCvX" crossorigin="anonymous">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Complete your profile</title>
+</head>
+
+{% block bootstrap4_content %}
+<nav class="navbar navbar-light bg-primary fixed-top">
+    <div class="container">
+    <a class="navbar-item" style="color:white"><strong>Department Insider: Tutorial</strong></a>
+    <a class="navbar-item" style="color:white"> Set up profile >> Join departments >> Write feedback</a>
+</nav>
+<div>
+	<br><br><br>
+
+<div class="container">
+    <div class="card">
+    <div class="card-header">
+    {% if nxt %}
+       <a href="{% url 'reviews:add_a_review' %}"><h3>Next >></h3></a>
+    {% else %}
+       <h3 class="text-primary">Please join {{ count }} more departments to start</h3>
+    {% endif %}
+    </div>
+    </div>
+  <p></p>
+  <div class="row">
+    {% for department in department_list %}
+      <div class="col-lg-6">
+        <div class="card">
+          <div class="card-header"><strong>
+            <div class="d-flex justify-content-between text-primary">
+              <div>
+                {{ department.name }}
+              </div>
+              <div>
+                <a href="{% url 'reviews:sub_dept' department.id %}" class="text-secondary">
+                + Join
+                </a>
+              </strong></div>
+            </div>
+          </div>
+          <div class="card-body">
+            <strong>{{ department.sub_count }} insiders</strong> | {{ department.tagline }}
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+</div>
+{% endblock %}

@@ -7,28 +7,54 @@ from django_select2.forms import ModelSelect2Widget, Select2MultipleWidget
 class ProfileForm(ModelForm):
     class Meta:
         model = Profile
-        fields = ['college','year']
+        fields = ['username','college','year']
 
 class ReviewForm(ModelForm):
     class Meta:
+        ASSESSMENTS = (
+        ('Problem sets','Problem sets'),
+        ('Projects','Projects'),
+        ('Presentations','Presentations'),
+        ('Exams','Exams'),
+        ('Papers','Papers')
+        )
         model = Review
-        fields = ['anonymous','rating','prof_name','pre_req','materials','class_size','assessment','work_load','diff_level','comment']
+        fields = ['restaurant','title','user_name','comment','prof_name','diff_level','syllabus','work_load','assessment']
+        #fields = ['rating','user_name','prof_name','pre_req','materials','class_size','assessment','work_load','diff_level','comment']
         widgets = {
             'comment': Textarea(attrs={'cols': 40, 'rows': 15}),
-            'prof_name': Textarea(attrs={'cols': 20, 'rows': 1}),
-            'pre_req': Textarea(attrs={'cols': 20, 'rows': 1}),
-            'materials': Textarea(attrs={'cols': 20, 'rows': 1}),
+            'assessment': Select2MultipleWidget(choices=ASSESSMENTS),
         }
+        labels = {
+            "restaurant": "Class",
+            "user_name": "Anonymous name"
+        }
+        help_texts = {
+            'user_name': 'Want to be anonymous? Use a name different than your username! Be creative!',
+        }
+
+    def __init__(self, department, *args, **kwargs):
+        super(ReviewForm, self).__init__(*args, **kwargs)
+        self.fields['restaurant'].queryset = Restaurant.objects.filter(department=department)
 
 class TopicForm(ModelForm):
     class Meta:
         model = Topic
-        fields = ['anonymous','title','content']
+        fields = ['title','username','content']
+        help_texts = {
+            'username': 'Your desired name to be displayed. If blank, your username will be used.',
+        }
+        widgets = {
+            'content': Textarea(attrs={'cols': 40, 'rows': 5}),
+        }
 
 class ResponseForm(ModelForm):
     class Meta:
         model = Response
-        fields = ['anonymous','content']
+        fields = ['username','content']
+        help_texts = {
+            'username': 'Your desired name to be displayed. If blank, your username will be used.',
+        }
 
 class DepartmentForm(forms.Form):
     college = forms.ModelChoiceField(
@@ -134,23 +160,19 @@ class GeneralReviewForm(forms.Form):
         (4,'Challenging'),
         (5,'Suffocating'),
     )
-
-    ANONY = (
-        (False,'False'),
-        (True,'True:Your username is NOT recorded.You CANNOT modify this review later!!'),
-    )
     
-    anonymous = forms.ChoiceField(choices=ANONY)
-    rating = forms.ChoiceField(choices=RATING_CHOICES)
-    prof_name = forms.CharField(max_length=100)
+    name = forms.CharField(label=u"Anonymous name",max_length=100,required=False,help_text='To be anonymous, put something different than your username - show your creativity! If blank, your username will be used.')
+    rating = forms.ChoiceField(label=u"Recommendation out of 5",choices=RATING_CHOICES)
+    prof_name = forms.CharField(label=u"Taken with",help_text='instructor name', max_length=100)
     assessment = forms.MultipleChoiceField(choices=ASSESSMENTS, widget=Select2MultipleWidget,help_text='select all options applicable')
-    class_size = forms.IntegerField()
-    pre_req = forms.CharField(label=u"Prior knowledge",max_length=100)
-    materials = forms.CharField(max_length=100)
+    title = forms.CharField(label=u"This class in one sentence",max_length=50)
+    #pre_req = forms.CharField(label=u"Prior knowledge",max_length=100)
+    #materials = forms.CharField(label=u"Materials needed",max_length=100)
     work_load = forms.IntegerField(help_text='hours spent outside class per week')
     diff_level = forms.ChoiceField(label=u"Difficulty level",choices=DIFF_LEVEL)
-    comment = forms.CharField(max_length=400)
     
+    comment = forms.CharField(label=u"Class Feedback",max_length=400,widget=forms.Textarea(attrs={"rows":5, "cols":20}))
+    syllabus = forms.FileField(label=u"Upload Syllabus(Optional)",required=False)
 # class GeneralReviewForm(forms.ModelForm):
 #     class Meta:
 #         model = Review

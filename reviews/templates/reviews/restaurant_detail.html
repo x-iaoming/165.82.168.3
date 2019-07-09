@@ -1,48 +1,66 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
+{% load bootstrap4 %}
 
 {% block title %}
-<h6><a href="{% url 'reviews:find_review_result' restaurant.department.id %}"> << Back to {{ restaurant.department.name }}</a></h6>
-<h2>{{ restaurant.name }}</h2>
-<h5>Recommended {{ restaurant.average_rating | floatformat }} of 5 by {{ restaurant.review_set.count }} reviews
-<br>Average difficulty: {{ class.average_diff | floatformat }}
-<br>Average workload: {{ class.average_wl | floatformat }} hours per week outside class</h5>
-{% endblock %}
-
-{% block content %}
-{% if inside %}
-<h4>You're in {{ restaurant.department.name }} insider group! <a href="{% url 'reviews:department_detail' restaurant.department.id %}">Explore now >> </a></h4>
-{% else %}
-<h4>Do you want to be a part of the {{restaurant.department.college.name}} {{restaurant.department.name}} insiders group? Join by reviewing a class or getting invited! </h4>
-{% endif %}
-
-{% buttons %}
-<button onclick="window.location.href = '/class/add_general_review';">
-    {% bootstrap_icon "star" %} Add Review
-</button>
-{% endbuttons %}
-</form>
-
-
-{% if restaurant_review_list %}
 <div class="row">
-    {% for review in restaurant_review_list %}
-    <div class="col-xs-6 col-lg-4">
-        <h4><a href="{% url 'reviews:user_profile' review.user_name %}" >{{ review.user_name }}</a> recommended {{ review.rating }} of 5</h4>
-        <p>{{ review.pub_date }}</p>
-        <p>Taught by: {{ review.prof_name }}</p>
-        <p>Class size: {{ review.get_class_size_display }}</p>
-        <p>Workload: {{ review.get_work_load_display }}</p>
-        <p>Level of difficulty: {{ review.get_diff_level_display }}</p>
-        <p>Type of assessment: {{ review.assessment }}</p>
-        <p>Prerequisite: {{ review.pre_req }}</p>
-        <p>Materials required: {{ review.materials }}</p>
-        <p><strong>{{ review.comment }}</strong></p>
-        <h6><a href="{% url 'reviews:like_review' review.id %}">Helpful {{ review.get_like_counts }}</a><a onclick="return confirm('You will not see this review after reporting. Proceed?')" href="{% url 'reviews:report_review' review.id %}">&nbsp &nbsp Report</a></h6> 
+  <div class="col-md-3" >
+    <div class="card">
+      <div class="card-header">
+        <a href="{% url 'reviews:department_list' restaurant.department.id %}"><< {{ restaurant.department.college.name}} {{ restaurant.department.name}}</a>
+        <h2><strong>{{ restaurant.name }}</strong></h2>
+        <a href="{% url 'reviews:add_review' restaurant.department.id%}"><span class="badge badge-pill badge-primary">+ Add class feedback</span></a>
+      </div>
+      <div class="card-body">
+        <p class="card-text">
+          Total {{ restaurant.review_set.count }} reviews
+          <br> Average recommended {{ restaurant.average_rating | floatformat }} of 5 
+          <br>Average difficulty: {{ class.average_diff | floatformat }}
+          <br>Average workload: {{ class.average_wl | floatformat }} hours per week outside class
+        </p>
+      </div>
     </div>
-    {% endfor %}
+    <p></p>
+  </div>
+
+  <div class="col-md-9">
+    {% if restaurant_review_list %}
+      <div class="row">
+        {% for review in restaurant_review_list %}
+          <div class="col-lg-6">
+            <div class="card">
+              <div class="card-header">
+                <h4> Recommended {{ review.rating }} of 5 </h4>
+                 <div class="text-secondary">{{ review.user_name }}; {{ review.pub_date }}</div>
+              </div>
+              <div class="card-body">
+                <strong>Taught by:</strong>  {{ review.prof_name }}
+                <br><strong>Workload:</strong>  {{ review.get_work_load_display }} hours per week outside class
+                <br><strong>Level of difficulty:</strong>  {{ review.get_diff_level_display }}
+                <br><strong>Type of assessment:</strong>  {{ review.assessment }}
+                <br><strong>Prior knowledge:</strong>  {{ review.pre_req }}
+                <br><strong>Materials needed:</strong>  {{ review.materials }}
+                {% if review.syllabus %}
+                  <br><strong>Syllabus:</strong> <a href="{{ review.syllabus.url }}"> {{ review.syllabus.name }}</a></strong>
+                {% else %}
+                {% endif %}
+                <br><br><strong>{{ review.comment }}</strong>
+                <h6><a href="{% url 'reviews:like_review' review.id %}">Helpful {{ review.get_like_counts }}</a><a onclick="return confirm('You will not see this review after reporting. Proceed?')" href="{% url 'reviews:report_review' review.id %}">&nbsp &nbsp Report</a></h6> 
+              </div>
+            </div>
+            <p></p>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <br>
+      <h3>Please help us by adding more reviews for this class</h3> 
+      (づ｡◕‿‿◕｡)づ
+    {% endif %}
+  </div>
 </div>
-{% else %}
-{% endif %}
+
+
+
+
 
 {% endblock %}

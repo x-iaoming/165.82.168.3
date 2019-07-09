@@ -1,37 +1,121 @@
-{% load bootstrap3 %}
-{% bootstrap_css %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/bootstrap-material-design@4.1.1/dist/css/bootstrap-material-design.min.css" integrity="sha384-wXznGJNEXNG1NFsbm0ugrLFMQPWswR3lds2VeinahP8N0zJw9VWSopbjv2x7WCvX" crossorigin="anonymous">
+<!-- Material Design for Bootstrap fonts and icons -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons">
+<!-- Material Design for Bootstrap CSS -->
+<link rel="stylesheet" href="https://unpkg.com/bootstrap-material-design@4.1.1/dist/css/bootstrap-material-design.min.css" integrity="sha384-wXznGJNEXNG1NFsbm0ugrLFMQPWswR3lds2VeinahP8N0zJw9VWSopbjv2x7WCvX" crossorigin="anonymous">
+<link 
+    rel="stylesheet"
+    href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"
+    integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+{% load bootstrap4 %}
 {% bootstrap_javascript %}
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Department Insider</title>
+    <style>
+body{
 
-{% block bootstrap3_content %}
-<title>Department Insider</title>
+}
 
-<div class="container">
-    <nav class="navbar navbar-default">
-        <div class="navbar-header">
-            <a class="navbar-brand" href="{% url 'reviews:review_list' %}"><b>Department Insider</b></a>
-        </div>
-        <div id="navbar" class="navbar-collapse collapse">
-            <ul class="nav navbar-nav">
-                <li><a href="{% url 'reviews:find_review' %}">Reviews</a></li>
-                <li><a href="{% url 'reviews:department_list_all' %}">Insiders</a></li>
-            </ul> 
+html {
+  font-size: 1rem;
+}
 
-            <ul class="nav navbar-nav navbar-right">  
-                {% if user.is_authenticated %}
-                <li><a href="{% url 'reviews:user_profile' user.username %}">{{ user.username}}</a></li>
-            </ul>
-                {% else %}
-                <li><a href="{% url 'auth:login' %}">Login/Sign Up</a></li>
-                {% endif %}
-            
-        </div>
-    </nav>
+@include media-breakpoint-up(sm) {
+  html {
+    font-size: 1.2rem;
+  }
+}
 
+@include media-breakpoint-up(md) {
+  html {
+    font-size: 1.4rem;
+  }
+}
+
+@include media-breakpoint-up(lg) {
+  html {
+    font-size: 1.6rem;
+  }
+}
+
+
+p.capitalize {
+  text-transform: capitalize;
+}
+
+.navbar-nav > li{
+  padding-right:15px;
+}
+
+.navbar {
+    z-index:9;
+}
+
+.sticky-offset {
+    top: 80px;
+}
+    </style>
+
+</head>
+
+
+{% block bootstrap4_content %}
+
+<nav class="navbar navbar-expand navbar-light bg-primary fixed-top">
+  <div class="container">
+    <a class="navbar-item" style="color:white"><strong>Department Insider</strong></a>
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link d-none d-sm-none d-md-block d-lg-block" href="{% url 'reviews:latest' %}" style="color:white"><i class='fas fa-home'></i> Latest</a>
+          <a class="nav-link d-block d-sm-block d-md-none d-lg-none" href="{% url 'reviews:latest' %}" style="color:white">&nbsp<i class='fas fa-home'></i></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link d-none d-sm-none d-md-block d-lg-block" href="{% url 'reviews:review_list' %}" style="color:white"><i class='fas fa-search'></i> Explore</a></a>
+          <a class="nav-link d-block d-sm-block d-md-none d-lg-none" href="{% url 'reviews:review_list' %}" style="color:white">&nbsp<i class='fas fa-search'></i></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link d-none d-sm-none d-md-block d-lg-block" href="{% url 'reviews:add_general_review' %}" style="color:white"><i class='fas fa-pen'></i> Evaluate</a>
+          <a class="nav-link d-block d-sm-block d-md-none d-lg-none" href="{% url 'reviews:add_general_review' %}" style="color:white">&nbsp<i class='fas fa-pen'></i></a>
+        </li>
+      </ul>
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+            {% if user.is_authenticated %}
+            <a class="nav-link d-none d-sm-none d-md-block d-lg-block" href="{% url 'reviews:user_profile' user.id %}" style="color:white"><i class='fas fa-user'></i> {{ user.profile.username}}</a>
+            <a class="nav-link d-block d-sm-block d-md-none d-lg-none" href="{% url 'reviews:user_profile' user.id %}" style="color:white">&nbsp<i class='fas fa-user'></i></a>
+            {% else %}
+            <a class="nav-link d-none d-sm-none d-md-block d-lg-block" href="{% url 'auth:login' %}" style="text-decoration : none;color:white"><i class='fas fa-user'></i>Login/Sign Up</a>
+            <a class="nav-link d-block d-sm-block d-md-none d-lg-none" href="{% url 'auth:login' %}" style="color:white">&nbsp<i class='fas fa-user'></i></a>
+            {% endif %}
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+   
+<div>
+    <br><br><br>
+    <div class='container'>
     <h1>{% block title %}(no title){% endblock %}</h1>
-
+    </div>
     {% bootstrap_messages %}
-
-    {% block content %}(no content){% endblock %}
+    
+    <div class='container'>
+    {% block content %}{% endblock %}
+    </div>
 </div>
 
+<!-- Footer -->
+<footer class="page-footer font-small">
+
+  <!-- Copyright -->
+  <div class="footer-copyright text-center py-3">© 2019 Copyright: Ray Li | Version 0.1
+  </div>
+  <!-- Copyright -->
+
+</footer>
+<!-- Footer -->
 {% endblock %}

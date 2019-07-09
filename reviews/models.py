@@ -10,6 +10,7 @@ class College(models.Model):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    username = models.CharField(max_length=30,default="")
     college = models.ForeignKey(College,on_delete=models.CASCADE, null=True)
     year = models.IntegerField(null=True)
 
@@ -17,6 +18,7 @@ class Department(models.Model):
     name = models.CharField(max_length=30,null=True)
     college = models.ForeignKey(College, on_delete=models.CASCADE, null=True)
     sub = models.ManyToManyField(User,blank=True)
+    tagline = models.CharField(max_length=100,null=True)
 
     def __str__(self):
         return self.name
@@ -26,6 +28,7 @@ class Department(models.Model):
 
     def sub_count(self):
         return self.sub.all().count()
+
 
 class Restaurant(models.Model):
     name = models.CharField(max_length=200)
@@ -56,6 +59,14 @@ class Review(models.Model):
         (5,'5'),
     )
 
+    ASSESSMENTS = (
+        ('Problem sets','Problem sets'),
+        ('Projects','Projects'),
+        ('Presentations','Presentations'),
+        ('Exams','Exams'),
+        ('Papers','Papers')
+    )
+
     # ASSESSMENTS = (
     #     (1,'Problem sets'),
     #     (2,'Projects'),
@@ -70,12 +81,12 @@ class Review(models.Model):
         (3,'Large:20+'),
     )
 
-    WORK_LOAD = (
-    	(1,'Light:<=3 hours/week'),
-    	(2,'Medium:<=6 hours/week'),
-    	(3,'Heavy:<=10 hours/week'),
-    	(4,'Insane:>10 hours/week'),
-    )
+    # WORK_LOAD = (
+    # 	(1,'Light:<=3 hours/week'),
+    # 	(2,'Medium:<=6 hours/week'),
+    # 	(3,'Heavy:<=10 hours/week'),
+    # 	(4,'Insane:>10 hours/week'),
+    # )
 
     DIFF_LEVEL = (
     	(1,'VeryEasy'),
@@ -85,30 +96,34 @@ class Review(models.Model):
     	(5,'Suffocating'),
     )
 
-    ANONY = (
-        (False,'False'),
-        (True,'True:Your username is NOT recorded.You CANNOT modify this review later!!'),
-    )
+    # ANONY = (
+    #     (False,'False'),
+    #     (True,'True:Your username is NOT recorded.You CANNOT modify this review later!!'),
+    # )
+    slug = models.SlugField(null=True)
 
     restaurant = models.ForeignKey(Restaurant,on_delete=models.SET_NULL, null=True)
-    college = models.ForeignKey(College,on_delete=models.SET_NULL, null=True)
+    #college = models.ForeignKey(College,on_delete=models.SET_NULL, null=True)
 
     users_reported = models.ManyToManyField(User,blank=True)
-    users_liked = models.ManyToManyField(User,related_name='users_liked_review',blank=True)
+    users_liked = models.ManyToManyField(User,related_name='likes',blank=True)
     
+    user = models.ManyToManyField(User,related_name='user')
     pub_date = models.DateTimeField('date published',auto_now_add=True)
     user_name = models.CharField(max_length=100)
     prof_name = models.CharField(max_length=100,default='')
-    comment = models.CharField(max_length=200)
-    pre_req = models.CharField(max_length=100,default='')
-    materials = models.CharField(max_length=100,default='')
-    anonymous = models.BooleanField(choices=ANONY,default=False)
+    title = models.CharField(max_length=50,blank=True, null=True)
+    comment = models.CharField(max_length=800)
+    #pre_req = models.CharField(max_length=100,default='')
+    #materials = models.CharField(max_length=100,default='')
+    #anonymous = models.BooleanField(choices=ANONY,default=False)
 
     rating = models.IntegerField(choices=RATING_CHOICES,default=5)
-    assessment = models.CharField(max_length=400,null=True)
-    class_size = models.IntegerField(choices=CLASS_SIZE,default=2)
-    work_load = models.IntegerField(choices=WORK_LOAD,default=2)
+    assessment = models.CharField(max_length=50,default='')
+    #class_size = models.IntegerField(choices=CLASS_SIZE,blank=True,null=True)
+    work_load = models.IntegerField()
     diff_level = models.IntegerField(choices=DIFF_LEVEL,default=2)
+    syllabus = models.FileField(upload_to='syllabus', blank=True, null=True)
 
     def get_users_reported(self):
         return "\n".join([u.username for u in self.users_reported.all()])
@@ -125,26 +140,23 @@ class Review(models.Model):
     def is_review(self):
         return True
 
-    def set_anonoymous(self):
-        if self.anonymous:
-            self.user_name = 'anonymous_users'
+    # def set_anonoymous(self):
+    #     if self.anonymous:
+    #         self.user_name = 'anonymous_users'
     # def get_reports(self):
     #     return "\n".join([r.report_review for r in self.Review.all()])
 
     # def get_username(self):
     #     return "\n".join([u.username for u in self.users.all()])
 class Topic(models.Model):
-    ANONY = (
-        (False,'False'),
-        (True,'True:Your username is NOT recorded.You CANNOT modify this review later!!'),
-    )
 
-    user_name = models.CharField(max_length=100)
+    user = models.ManyToManyField(User,related_name='topic_user')
+    username = models.CharField(max_length=100,null=True,blank=True)
     title = models.CharField(max_length=30)
     content = models.CharField(max_length=200)
     department = models.ForeignKey(Department,on_delete=models.SET_NULL, null=True)
-    anonymous = models.BooleanField(choices=ANONY,default=False)
-    pub_date = models.DateTimeField('date published',null=True)
+    pub_date = models.DateTimeField('date published',null=True,auto_now_add=True)
+    act_date = models.DateTimeField('last active',null=True,auto_now=True)
     users_reported = models.ManyToManyField(User,blank=True)
     users_liked = models.ManyToManyField(User,related_name='users_liked_topic',blank=True)
 
@@ -155,15 +167,11 @@ class Topic(models.Model):
         return self.users_liked.all().count()
 
 class Response(models.Model):
-    ANONY = (
-        (False,'False'),
-        (True,'True:Your username is NOT recorded.You CANNOT modify this review later!!'),
-    )
     
-    user_name = models.CharField(max_length=100)
+    user = models.ManyToManyField(User,related_name='response_user')
+    username = models.CharField(max_length=30,null=True,blank=True)
     topic = models.ForeignKey(Topic,on_delete=models.SET_NULL, null=True)
     content = models.CharField(max_length=200)
-    anonymous = models.BooleanField(choices=ANONY,default=False)
     pub_date = models.DateTimeField('date published',null=True)
     users_reported = models.ManyToManyField(User,blank=True)
     users_liked = models.ManyToManyField(User,related_name='users_liked_response',blank=True)

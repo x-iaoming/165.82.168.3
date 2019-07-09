@@ -5,15 +5,14 @@ from .models import Restaurant, Review, Cluster, College, Department, Topic, Res
 
 class ProfileAdmin(admin.ModelAdmin):
     model = Profile
-    list_display = ['user','college','year']
+    list_display = ['user','username','college','year']
     list_filter = ['college','year']
 
 class ReviewAdmin(admin.ModelAdmin):
     model = Review
-    list_display = ('restaurant','rating','user_name','prof_name','comment',
-        'pub_date','pre_req','materials','class_size',
-        'assessment','work_load','diff_level','get_report_counts','get_like_counts')
-    list_filter = ['pub_date','user_name','class_size','assessment','work_load','prof_name','diff_level']
+    list_display = ('restaurant','rating','user_name','prof_name','comment','title',
+        'pub_date','assessment','work_load','diff_level','get_report_counts','get_like_counts')
+    list_filter = ['pub_date','user_name','assessment','work_load','prof_name','diff_level']
     search_fields = ['comment']
 
 class ReviewRestaurant(admin.ModelAdmin):
@@ -24,11 +23,11 @@ class ReviewRestaurant(admin.ModelAdmin):
 
 class DepartmentAdmin(admin.ModelAdmin):
     model = Department
-    list_display = ('name','college','get_subs')
+    list_display = ('name','college','get_subs','tagline')
 
 class TopicAdmin(admin.ModelAdmin):
     model = Topic
-    list_display = ('user_name','title','content','pub_date')
+    list_display = ('username','title','content','act_date','pub_date')
     search_fields = ['department']
 
 class ClusterAdmin(admin.ModelAdmin):
@@ -41,7 +40,7 @@ class CollegeAdmin(admin.ModelAdmin):
 
 class ResponseAdmin(admin.ModelAdmin):
     model = Response
-    list_display = ['content','user_name','pub_date']
+    list_display = ['content','username','pub_date']
 # class UserProfileInline(admin.StackedInline):
 #     model = UserProfile
 #     can_delete = True

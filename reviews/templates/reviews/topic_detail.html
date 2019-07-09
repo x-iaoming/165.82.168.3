@@ -1,22 +1,23 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
+{% load bootstrap4 %}
 
 {% block title %}
-<h6><a href="{% url 'reviews:department_detail' topic.department.id %}"> << Back to {{ topic.department.name }}</a></h6>
-<h2>{{ topic.title }}</h2>
-<h5>{{ topic.pub_date }} by {{ topic.user_name }}</h5>
-<h5><a href="{% url 'reviews:like_topic' topic.id %}">Like</a></h5>
-<h5><a href="{% url 'reviews:report_topic' topic.id %}">Report</a></h5>
-<h5>{{ topic.content }}</h5>
 {% endblock %}
 
 {% block content %}
+<h6><a href="{% url 'reviews:department_list' topic.department.id %}"><< {{ topic.department.college.name }} {{ topic.department.name }} Insider</a></h6>
+<h2>{{ topic.title }}</h2>
+<h6>{{ topic.pub_date }} by {{ topic.username }}</h6>
+<h5><a href="{% url 'reviews:like_topic' topic.id %}">Like</a></h5>
+<h5><a href="{% url 'reviews:report_topic' topic.id %}">Report</a></h5>
+<h5>{{ topic.content }}</h5>
+
 <br>
 {% if topic_response_list %}
 <div class="row">
     {% for response in topic_response_list %}
     <div class="col-xs-6 col-lg-4">
-        <h6>{{ response.pub_date }} by {{ response.user_name }}</h6> 
+        <h6>{{ response.pub_date }} by {{ response.username }}</h6> 
         <h4>{{ response.content }}</h4>
     </div>
     {% endfor %}
@@ -25,7 +26,6 @@
 <p>Respond to {{ topic.user_name }} now!</p>
 {% endif %}
 
-<h3>Response</h3>
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>
 {% else %}
 <form action="{% url 'reviews:add_response' topic.id %}" method="post" class="form">
@@ -35,7 +35,7 @@
 {% endfor %}
 {% buttons %}
 <button type="submit" class="btn btn-primary">
-    {% bootstrap_icon "star" %} Add
+     Add Response
 </button>
 {% endbuttons %}
 </form>

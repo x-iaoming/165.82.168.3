@@ -1,31 +1,108 @@
 {% extends 'base.html' %}
+{% load bootstrap4 %}
 
 {% block title %}
+{{ form.media.css }}
 {% endblock %}
 
 {% block content %}
-<!--
-<div class="panel panel-default"> 
-    <div class="panel-heading"><h4>Rate restaurants and get recommendations based on people with similar preferences</h4></div>
-    <div class="panel-body"><footer><a href="https://www.linkedin.com/in/ruiming100/">Ray (Ruiming) Li</a>: <a href="mailto:ruiming100@gmail.com?Subject=Hello%20Ray" target="_top">ruiming100@gmail.com</a><br>developed this sample web-based machine learning project.</footer><footer><br>He made use of nginx + uwsgi + django framework and K-Nearest Neighbor algorithm in sklearn package. He would like to give special thanks to server at Haverford College and step-by-step django tutorial by Jose A Dianes. Click register to give it a try ;)</footer></div>
-</div>
--->
-<h3>Latest Threads</h3>
-{% if result_list %}
-<div class="row">
-    {% for result in result_list %}
-    <div>
-        {% if result.is_review %}
-        <p><h4><a href="{% url 'reviews:restaurant_detail' result.restaurant.id %}">{{ result.user_name}} recommended {{ result.restaurant }} {{ result.rating }} of 5</a></h4>
+<div class="card">
+  <div class="card-header text-primary">
+    <h3>Explore Departments</h3>
+  </div>
+  <div class="card-body" align="center">
+        {% if error_message %}<p><strong>{{ error_message }}</strong></p>
         {% else %}
-        <p><h4><a href="{% url 'reviews:topic_detail' result.id %}">{{ result.title }}</a></h4>
+          <form action="{% url 'reviews:department_list_all'%}" method="post" class="form">
+          {% csrf_token %}
+          {% for field in form %}
+          {% bootstrap_field field %}
+          {% endfor %}
+          {% buttons %}
+          <button type="submit" class="btn btn-raised btn-primary" >
+          Go
+          </button>
+          {% endbuttons %}
+          </form>
         {% endif %}
-    {{ result.pub_date }}</p>
-    <br>
-    </div>
-    {% endfor %}
+  </div>
 </div>
-{% else %}
-<p>No thread is available.</p>
-{% endif %}
+
+<br>
+
+  <div align="center" class="bg-white">
+  <div class="card-header text-primary" align="left">
+    <h3>What's Trending</h3>
+  </div>
+    <p></p>
+
+    
+    <h5 class="card-title"><strong>Most popular departments</strong></h5>
+    <div class="row">
+      {% for dept in most_followed%}
+        <div class="col-lg-3">
+          <div class="card">
+            <p class="card-header"><a href="{% url 'reviews:department_list' dept.id%}">{{ dept.college.name }} {{ dept.name }}</a></p>
+            <p class="card-body"> {{ dept.sub.count}} Insiders
+            <br><strong>{{ dept.tagline}}</strong></p>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+<p></p>
+    <h5 class="card-title"><strong>Most recommended classes</strong></h5>
+      <div class="row">
+        {% for class in most_recommended %}
+          <div class="col-lg-3">
+            <div class="card">
+              <p class="card-header"><a href="{% url 'reviews:department_list' class.department.id %}">{{ class.department.college.name }} {{ class.department.name }}</a></p>
+              <p class="card-body"> {{ class.name }} 
+              <br>average recommended {{ class.average_rating | floatformat:2 }}<a href="{% url 'reviews:restaurant_detail' class.id %}"> Detail>></a></p>
+            </div>
+          </div>
+    {% endfor %}
+  </div>
+<p></p>
+<h5 class="card-title"><strong>Most helpful feedback</strong></h5>
+      <div class="row">
+        {% for review in most_helpful%}
+          <div class="col-lg-3">
+            <div class="card">
+              <p class="card-header"><a href="{% url 'reviews:department_list' review.restaurant.department.id %}">{{ review.restaurant.department.college.name }} {{ review.restaurant.department.name }}</a></p>
+              <p class="card-body"> {{review.num_liked}} found {{ review.user_name }}'s feedback of {{ review.restaurant.name }} helpful 
+              <a href="{% url 'reviews:review_detail' review.id %}"> Detail>></a></p>
+            </div>
+          </div>
+    {% endfor %}
+  </div>
+<p></p>
+    <h5 class="card-title"><strong>Most active topic</strong></h5>
+      <div class="row">
+        {% for topic in most_active%}
+          <div class="col-lg-3">
+            <div class="card">
+              <p class="card-header"><a href="{% url 'reviews:department_list' topic.department.id %}">{{ topic.department.college.name }} {{ topic.department.name }}</a></p>
+              <p class="card-body"> <strong>{{ topic.title }}</strong> has {{ topic.num_likes }} likes <a href="{% url 'reviews:topic_detail' topic.id %}"> Detail>></a></p>
+            </div>
+          </div>
+    {% endfor %}
+  </div>
+<!--
+<p></p>
+    <h5 class="card-title"><strong>Most 'inside' users</strong></h5>
+      <div class="row">
+        {% for user in most_inside%}
+          <div class="col-lg-3">
+            <div class="card">
+              <p class="card-header"><a href="{% url 'reviews:user_profile' user.id%}">{{ user.profile.college }} {{ user.profile.username }}</a></p>
+              <p class="card-body"> In {{ user.num_inside }} insider's groups </p>
+            </div>
+          </div>
+    {% endfor %}
+  </div>
+-->
+</div>
+
+
+{{ form.media.js }}
 {% endblock %}

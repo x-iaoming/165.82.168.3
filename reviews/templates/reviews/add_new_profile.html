@@ -1,0 +1,39 @@
+{% load bootstrap4 %}
+{% bootstrap_javascript %}
+
+<head>
+	<link rel="stylesheet" href="https://unpkg.com/bootstrap-material-design@4.1.1/dist/css/bootstrap-material-design.min.css" integrity="sha384-wXznGJNEXNG1NFsbm0ugrLFMQPWswR3lds2VeinahP8N0zJw9VWSopbjv2x7WCvX" crossorigin="anonymous">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Complete your profile</title>
+</head>
+
+{% block bootstrap4_content %}
+<nav class="navbar navbar-light bg-primary fixed-top">
+	<div class="container">
+    <a class="navbar-item" style="color:white"><strong>Department Insider: Tutorial</strong></a>
+    <a class="navbar-item" style="color:white"> Set up profile >> Join departments >> Write feedback</a>
+</nav>
+<div>
+	<br><br><br>
+<div class="container">
+	<div class="card">
+		<div class="card-header">
+			<h3 class="text-primary">Welcome friend!</h3><h5> First, let us know more about you:<br> (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧</h5>
+		</div>
+		<div class="card-body">
+		<form action="{% url 'reviews:add_new_profile' user.id %}" method="post" class="form">
+        {% csrf_token %}
+        {% for field in form %}
+        {% bootstrap_field field %}
+        {% endfor %}
+        {% buttons %}
+        <button type="submit" class="btn btn-raised btn-primary">
+          Next >>
+        </button>
+        {% endbuttons %}
+        </form>
+    </div>
+    </div>
+</div>
+</div>
+{% endblock %}

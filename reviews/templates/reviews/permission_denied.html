@@ -1,13 +1,22 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
-
+{% load bootstrap4 %}
 
 {% block title %}
-<h2>Uhh Ohh...You're not an insider of this department yet!</h2>
 {% endblock %}
 
 {% block content %}
-<h3>Wanna be an insider?</h3>
-<h4><a href="{% url 'reviews:find_review'%}">Take a class</a> in the department and <a href="{% url 'reviews:add_general_review'%}">review your class</a> in this department</h4>
-<h4>Or ask an insider to invite you!</h4>
+<div class="card">
+  <div class="card-header">
+    <h2>( ﾟヮﾟ) Uhh Ohh...</h2>
+  </div>
+  <div class="card-body">
+    <blockquote class="blockquote mb-0">
+      <p>You're not an insider of {{ department.college.name }} {{ department.name }} yet!
+      <br>Wanna be an insider? ᕙ(⇀‸↼‶)ᕗ
+      <br>Check out <a href="{% url 'reviews:department_list' department.id %}">{{ department.college.name }} {{ department.name }} >></a></p>
+      <footer class="blockquote-footer" align="right">Someone famous in <cite title="Source Title">Source Title</cite></footer>
+    </blockquote>
+  </div>
+</div>
+<h2>
 {% endblock %}

@@ -1,57 +1,119 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
+{% load bootstrap4 %}
 
 {% block title %}
 <script type = "text/javascript" src = "//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js" ></script>
 {{ form.media.css }}
-<h2>Find class review / <a href="{% url 'reviews:add_general_review'%}"> Add a review </a></h2>
+
 {% endblock %}
 
+
 {% block content %}
+<div class="row">
+  <div class="col-md-3" >
+
+<div class="card">
+  <div class="card-header">
+<h2>Find Reviews</h2>
+  </div>
+  <div class="card-body">
+<h5><a href="{% url 'reviews:add_general_review' %}">+ Add Reviews</a></h5>
 <form action="{% url 'reviews:find_review'%}" method="post" class="form">
 {% csrf_token %}
 {% for field in form %}
     {% bootstrap_field field %}
 {% endfor %}
 {% buttons %}
-<button type="submit" class="btn btn-primary">
-    {% bootstrap_icon "star" %} Search
+<button type="submit" class="btn btn-raised btn-primary" >
+          Go
 </button>
 {% endbuttons %}
 </form>
 {{ form.media.js }}
+</div>
+</div>
+<br>
+</div>
+<div class="col-md-9">
 
 {% if class_list %}
-<h2>Classes at {{ department.name}}</h2>
+<div class="card">
+  <div class="card-header text-primary">
+    <h2>{{ department.college.name}} {{ department.name}} Reviews</h2>
+  </div>
+  <div class="card-body">
+    <h5 class="card-subtitle mb-2 text-muted">{{ department.restaurant_set.count}} Classes | <a href="{% url 'reviews:department_list' department.id %}">Join department group >></a></h5>
+    <p class="card-text">
+        Welcome to {{ department.college.name}} {{ department.name}}! See below for a list of classes and their reviews. 
+        <br>If you have a question or have something to share, <strong>don't hestitate to join the insiders' group by <a href="{% url 'reviews:department_list' department.id %}">clicking here</a>.</strong> 
+    </p>
+   </div>
+</div>
+
+<br>
+<div class="card">
+  <div class="card-header">
+    <h3>Class Reviews</h3>
+  </div>
+</div>
+
 <div class="row">
     {% for class in class_list %}
-    <div class="col-xs-6 col-lg-4">
-        <h3><a href="{% url 'reviews:restaurant_detail' class.id %}">
-        {{ class.name }}</a></h3>
-        <h5>Average rating: {{ class.average_rating | floatformat }}/5
-        <br>Average difficulty: {{ class.average_diff | floatformat }}/5
-        <br>Average workload: {{ class.average_wl | floatformat }} hours per week outside class</h5>
-        
+    <div class="col-lg">
+      <div class="card">
+        <div class="card-body">
+          <h4><a href="{% url 'reviews:restaurant_detail' class.id %}">
+          {{ class.name }}</a></h4>
+          <h5>Average rating: {{ class.average_rating | floatformat }}/5
+          <br>Average difficulty: {{ class.average_diff | floatformat }}/5
+          <br>Average workload: {{ class.average_wl | floatformat }} hours per week outside class</h5>
+        </div>
+      </div>
     </div>
     {% endfor %}
+</div>
+</div>
 </div>
 {% else %}
 {% endif %}
 
 {% if review_list %}
-<h2>Latest reviews</h2>
+<h2>Latest Reviews</h2>
 <div class="row">
     {% for review in review_list %}
-    <div class="col-xs-6 col-lg-4">
-        <h3><a href="{% url 'reviews:restaurant_detail' review.restaurant.id %}">
-        {{ review.restaurant }}</a></h3>
-        <h5>Rating: {{ review.rating | floatformat }}/5 by {{ review.user_name }}
-        <br>Difficulty: {{ review.diff_level | floatformat }}/5
-        <br>Workload: {{ review.work_load | floatformat }} hours per week outside class</h5> 
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header"><strong>
+              <div class="d-flex justify-content-between text-primary">
+                <h5>
+                  {{ review.restaurant.department.college }} {{ review.restaurant }}
+                  </h5>
+                <div>
+                  <a href="{% url 'reviews:restaurant_detail' review.restaurant.id %}" class="text-secondary">⋮ More
+                  </a>
+                </div>
+              </div>
+            </div></strong>
+            <div class="card-body">
+              <p class="card-text text-muted">Recommended: {{ review.rating | floatformat }}/5 by {{ review.user_name }}
+              <br>Difficulty: {{ review.diff_level | floatformat }}/5
+              <br>Workload: {{ review.work_load | floatformat }} hours per week outside class
+              <br>Assessment: {{ review.assessment }}
+              {% if review.syllabus %}
+              <br>Syllabus: Click more to see
+              {% else %}
+              {% endif %}</p>
+              <h6>{{ review.comment }}</h6>
+              <a href="{% url 'reviews:like_review' review.id %}" class="card-link">Like {{ review.get_like_counts }}</a> 
+              <a href="{% url 'reviews:report_review' review.id %}" class="card-link">Report</a>
+            </div>
+        </div>
+    <br>
     </div>
     {% endfor %}
 </div>
 {% else %}
 {% endif %}
+</div>
 {% endblock %}
 
