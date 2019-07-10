@@ -19,7 +19,7 @@ class ReviewForm(ModelForm):
         ('Papers','Papers')
         )
         model = Review
-        fields = ['restaurant','title','user_name','comment','prof_name','diff_level','syllabus','work_load','assessment']
+        fields = ['restaurant','title','user_name','rating','comment','prof_name','diff_level','syllabus','work_load','assessment']
         #fields = ['rating','user_name','prof_name','pre_req','materials','class_size','assessment','work_load','diff_level','comment']
         widgets = {
             'comment': Textarea(attrs={'cols': 40, 'rows': 15}),

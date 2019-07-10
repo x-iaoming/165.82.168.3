@@ -17,9 +17,15 @@
   <div class="card d-none d-sm-none d-md-block d-lg-block">
     <div class="card-header" id="headingOne">
       <h5 class="mb-0">
-        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne"> Class Feedback ▾
-        </button>
-        <a href="{% url 'reviews:add_review' department.id %}"><h5 class='text-white'><span class="badge badge-pill badge-primary">+ Add </span></h5></a>
+        <div class="d-flex justify-content-between text-primary">
+          <div>
+            <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne"> Class Review <i class="fa fa-angle-down"></i>
+            </button>
+          </div>
+          <div>
+            <a href="{% url 'reviews:add_review' department.id %}"><h5 class='text-white'><span class="badge badge-pill badge-primary">+ Add </span></h5></a>
+         </div>
+        </div>
       </h5>
     </div>
     <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
@@ -47,9 +53,13 @@
 <div class="card d-none d-sm-none d-md-block d-lg-block">
     <div class="card-header" id="headingFour">
       <h5 class="mb-0">
-        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseFour" aria-expanded="false" aria-controls="collapseOne"> My Departments ▾
-        </button>
-        <a href="{% url 'reviews:review_list'%}"><h5 class='text-white'><span class="badge badge-pill badge-primary">+ Explore </span></h5></a>
+  
+
+            <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseFour" aria-expanded="false" aria-controls="collapseOne"> My Groups <i class="fa fa-angle-down"></i>
+            </button>
+
+
+
       </h5>
     </div>
     <div id="collapseFour" class="collapse show" aria-labelledby="headingFour" data-parent="#accordion">
@@ -58,7 +68,7 @@
           {% if user.is_authenticated %}
           {% if sub_dept_list %}
           {% for sub in sub_dept_list %}
-            <li class="list-group-item"><a href="{% url 'reviews:department_list' sub.id%}">{{ sub.name }}</a></li>
+            <li class="list-group-item"><a href="{% url 'reviews:department_list' sub.id %}">{{ sub.name }}</a></li>
           {% endfor %}
           {% else %}
           {% endif %}
@@ -168,16 +178,16 @@
 {% if sub %}
 <div class="card-body">
 <h5 class="card-subtitle mb-2 text-muted">
-	You're an insider! | {{department.sub.count}} Insiders<button class="btn btn-secondary" type="button" data-toggle="collapse" data-target="#collapse2" aria-expanded="false" aria-controls="collapse2">▾</button></h5>
+	You're an insider! |<button class="btn btn-secondary" type="button" data-toggle="collapse" data-target="#collapse2" aria-expanded="false" aria-controls="collapse2">{{department.sub.count}} Insiders <i class="fa fa-angle-down" style="color:grey"></i></button></h5>
   
     <div id="collapse2" class="collapse" aria-labelledby="headingTwo">
-      <div class="card-body">
+      
         <ul class="list-group list-group-flush">
           {% for sub in sub_list %}
-            <li class="list-group-item"><a href="{% url 'reviews:user_profile' sub.id%}"> {{ sub.profile.username }} {{ sub.profile.year }}</a></li>
+            <a href="{% url 'reviews:user_profile' sub.id%}"> {{ sub.profile.username }} {{ sub.profile.year }}</a>
           {% endfor %}
         </ul>
-      </div>
+      
     </div>
 
 <p class="card-text">
@@ -193,9 +203,15 @@ You can choose to be anonymous when posting. ALL post contents are visible to {{
 <div class="card d-block d-sm-block d-md-none d-lg-none">
     <div class="card-header" id="headingOne">
       <h5 class="mb-0">
-        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapse1" aria-expanded="false" aria-controls="collapse1"> Class Feedback ▾
+        <div class="d-flex justify-content-between text-primary">
+          <div>
+        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapse1" aria-expanded="false" aria-controls="collapse1"> Class Review <i class="fa fa-angle-up"></i>
         </button>
+          </div>
+          <div>
         <a href="{% url 'reviews:add_review' department.id %}"><h5 class='text-white'><span class="badge badge-pill badge-primary">+ Add </span></h5></a>
+          </div>
+        </div>
       </h5>
     </div>
     <div id="collapse1" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
@@ -211,7 +227,7 @@ You can choose to be anonymous when posting. ALL post contents are visible to {{
 
 <p></p>
 
-<div class="card">
+<div style="background-color:white">
 <div class="card-header">
 <div class="d-flex justify-content-between text-primary">
 <div>
@@ -224,20 +240,20 @@ You can choose to be anonymous when posting. ALL post contents are visible to {{
 </div>
 </div>
 
-<div class>
-    {% if result_list %}
+<div>
+  {% if result_list %}
     {% for result in result_list %}
-    <div class="card">
-    	<div class="card-body">
-        {% if result.is_review %}
-          <h5 class="text-primary"> {{ result.title }} </h5>
-              <div class="text-secondary">{{ result.user_name }}; {{ result.pub_date }}</div>
+      {% if result.is_review %}
+        <div class="card">
+          <div class="card-body">
+            <h5 class="text-primary"> {{ result.title }} </h5>
+            <div class="text-secondary">{{ result.user_name }}; {{ result.pub_date }}</div>
             <strong>{{ result.comment }}</strong>
-            <div id="count{{ result.id }}">
-            <div id="count{{ result.id }}">
+            <div></div>
             <input type="button" class="btn btn-primary" id="like{{ result.id }}" value="Like | {{ result.get_like_counts }}" name="{{ result.id }}" />
             <a onclick="return confirm('You will not see this review after reporting. Proceed?')" href="{% url 'reviews:report_review' result.id %}">&nbsp &nbsp Report</a>
-  </div>   
+          </div>  
+        </div> 
 
 <script>
 $('#like{{ result.id }}').on("click",function(){
@@ -256,14 +272,16 @@ $('#like{{ result.id }}').on("click",function(){
       
     })
 </script>
-        {% else %}
-          <h5 class="text-primary"> {{ result.title }} </h5>
-              <div class="text-secondary">{{ result.username }}; {{ result.pub_date }}</div>
-              <strong>{{ result.content }}</strong>
+      {% else %}
+        <div class="card">
+          <div class="card-body">
+            <h5 class="text-primary"> {{ result.title }} </h5>
+            <div class="text-secondary">{{ result.username }}; {{ result.pub_date }}</div>
+            <strong>{{ result.content }}</strong>
             <br><br><a href="{% url 'reviews:like_topic' result.id %}">Respond {{ result.response_set.count }}</a><a href="{% url 'reviews:like_topic' result.id %}">&nbsp &nbsp Like {{ result.get_like_counts }}</a><a onclick="return confirm('You will not see this review after reporting. Proceed?')" href="{% url 'reviews:report_topic' result.id %}">&nbsp &nbsp Report</a>
-        {% endif %}
-      </div>
-    </div>
+          </div>
+        </div>
+      {% endif %}
     {% endfor %}
     {% else %}
     <div class="container">

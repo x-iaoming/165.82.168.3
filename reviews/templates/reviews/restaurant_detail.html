@@ -44,7 +44,7 @@
                 {% else %}
                 {% endif %}
                 <br><br><strong>{{ review.comment }}</strong>
-                <h6><a href="{% url 'reviews:like_review' review.id %}">Helpful {{ review.get_like_counts }}</a><a onclick="return confirm('You will not see this review after reporting. Proceed?')" href="{% url 'reviews:report_review' review.id %}">&nbsp &nbsp Report</a></h6> 
+                <h6><a href="{% url 'reviews:like_review' %}">Helpful {{ review.get_like_counts }}</a><a onclick="return confirm('You will not see this review after reporting. Proceed?')" href="{% url 'reviews:report_review' review.id %}">&nbsp &nbsp Report</a></h6> 
               </div>
             </div>
             <p></p>

@@ -5,9 +5,13 @@
 {% endblock %}
 
 {% block content %}
-<h6><a href="{% url 'reviews:department_list' topic.department.id %}"><< {{ topic.department.college.name }} {{ topic.department.name }} Insider</a></h6>
-<h2>{{ topic.title }}</h2>
-<h6>{{ topic.pub_date }} by {{ topic.username }}</h6>
+<div class="card">
+  <div class="card-header">
+    <h3 class="text-primary">{{ topic.title }}</h3>
+    <strong>{{ topic.username }}</strong> added a post in
+<a href="{% url 'reviews:department_list' topic.department.id %}" style="color:black"><strong>{{ topic.department.college.name }} {{ topic.department.name }}</strong></a><a class="text-secondary"> | {{ topic.pub_date }}</a>
+  </div>
+
 <h5><a href="{% url 'reviews:like_topic' topic.id %}">Like</a></h5>
 <h5><a href="{% url 'reviews:report_topic' topic.id %}">Report</a></h5>
 <h5>{{ topic.content }}</h5>
@@ -40,5 +44,6 @@
 {% endbuttons %}
 </form>
 {% endif %}
+</div>
 
 {% endblock %}
