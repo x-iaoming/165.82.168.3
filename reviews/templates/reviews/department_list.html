@@ -193,10 +193,10 @@
 <p class="card-text">
 <p><strong>  {{ department.tagline }} </strong></p>
 
-Thank you for being part of {{ department.college.name}} {{ department.name}}! We sincerely hope for your contribution towards this community by sharing your experiences and stories, responding to and connecting with other memebers, and simply asking any questions you have in mind! 
+<!-- Thank you for being part of {{ department.college.name}} {{ department.name}}! We sincerely hope for your contribution towards this community by sharing your experiences and stories, responding to and connecting with other memebers, and simply asking any questions you have in mind! 
 <br>
-You can choose to be anonymous when posting. ALL post contents are visible to {{ department.college.name}} {{ department.name}} insiders only.
-<p>
+You can choose to be anonymous when posting. ALL post contents are visible to {{ department.college.name}} {{ department.name}} insiders only. -->
+
 </div>
 </div>
 
@@ -247,7 +247,7 @@ You can choose to be anonymous when posting. ALL post contents are visible to {{
         <div class="card">
           <div class="card-body">
             <h5 class="text-primary"> {{ result.title }} </h5>
-            <div class="text-secondary">{{ result.user_name }}; {{ result.pub_date }}</div>
+            <div class="text-secondary">Anonymous | {{ result.pub_date }}</div>
             <strong>{{ result.comment }}</strong>
            <div id="count{{ result.id }}" >
           <button style="color:grey" type="button" class="btn btn-primary btn-sm" id="like{{ result.id }}" name="{{ result.id }}">
@@ -312,10 +312,11 @@ $('#like{{ result.id }}').on("click",function(){
 </div>
 {% else %}
 <div class="card-body">
+<h6><strong>{{department.tagline}}</strong></h6>
 <h5 class="card-subtitle mb-2 text-muted">{{department.sub.count}} Insiders | You have to join the group to view classes and reviews.</h5>
-<p class="card-text">
+<!-- <p class="card-text">
 The {{ department.college.name}} {{ department.name}} community is for any current students, alumns, and prospective students to <strong>freely and honestly discuss topics related to {{ department.name}} and share their experiences and resources.</strong>
-<p>
+<p> -->
 </div>
 </div>
 {% endif %}
