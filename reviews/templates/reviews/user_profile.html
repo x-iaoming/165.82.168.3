@@ -5,17 +5,17 @@
 {% endblock %}
 
 {% block content %}
-<div class="row">
-  <div class="col-md-3" >
-    <div class="card">
+<!-- <div class="row">
+  <div class="col-md-3" > -->
+    <div align="center">
       <div class="card-header text-primary">
         {% if profile %}
         <h3>{{ profile.username }}</h3>
         {% else %}
-        <h3>Add/Change Profile</h3>
+        <h3>Edit Profile</h3>
         {% endif %}
       </div>
-    <div class="card-body">
+    <div class="card-body" style="background-color: white">
       {% if profile %}
       <h5>College: {{ profile.college }}</h5>
       <h5>Graduation year: {{ profile.year }}</h5>
@@ -33,7 +33,7 @@
         <button type="submit" class="btn btn-raised btn-primary">
           Edit Profile
         </button>
-        <a href="{% url 'auth:logout' %}"> Logout </a>
+        <a class='btn btn-primary' href="{% url 'auth:logout' %}"> Logout </a>
         {% endbuttons %}
         </form>
       {% endif %}
@@ -41,11 +41,11 @@
     {% endif %}
     </div>
     </div>
-    <p></p>
-  </div>
 
 
-  <div class="col-md-9">
+
+
+ <!--  <div class="col-md-9">
     <div class="card">
       <div class="card-header">
         <h3> {{profile.username}}'s Insiders Group </h3>
@@ -114,7 +114,7 @@
     {% else %}
     {% endif %}
     </div>
-    </div>
+    </div> -->
 
 {% endblock %}
 

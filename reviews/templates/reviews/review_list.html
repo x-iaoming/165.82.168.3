@@ -6,11 +6,11 @@
 {% endblock %}
 
 {% block content %}
-<div class="card">
+
   <div class="card-header text-primary">
     <h3>Explore Departments</h3>
   </div>
-  <div class="card-body" align="center">
+  <div class="card-body" align="center" style="background-color: white">
         {% if error_message %}<p><strong>{{ error_message }}</strong></p>
         {% else %}
           <form action="{% url 'reviews:department_list_all'%}" method="post" class="form">
@@ -26,65 +26,45 @@
           </form>
         {% endif %}
   </div>
-</div>
+
 
 <br>
 
-  <div align="center" class="bg-white">
-  <div class="card-header text-primary" align="left">
-    <h3>What's Trending</h3>
+<div class="row">
+  <div class="col-lg-3">
+    <h5 class="card-header text-primary">Most popular departments
+    </h5>
+    {% for dept in most_followed %}
+            <div class="card-body" style="background-color: white"><a style="color:black" href="{% url 'reviews:department_list' dept.id%}"><strong><u>{{ dept.college.name }} {{ dept.name }}</u></strong></a>
+            <br>{{ dept.sub.count}} Insiders
+            <br>{{ dept.tagline}}</div>
+    {% endfor %}
   </div>
-    <p></p>
 
-    
-    <h5 class="card-title"><strong>Most popular departments</strong></h5>
-    <div class="row">
-      {% for dept in most_followed%}
-        <div class="col-lg-3">
-          <div class="card">
-            <p class="card-header"><a href="{% url 'reviews:department_list' dept.id%}">{{ dept.college.name }} {{ dept.name }}</a></p>
-            <p class="card-body"> {{ dept.sub.count}} Insiders
-            <br><strong>{{ dept.tagline}}</strong></p>
-          </div>
-        </div>
-      {% endfor %}
-    </div>
-<p></p>
-    <h5 class="card-title"><strong>Most recommended classes</strong></h5>
-      <div class="row">
+  <div class="col-lg-3">
+    <h5 class="card-header text-primary">Highest recommended classes
+    </h5>
         {% for class in most_recommended %}
-          <div class="col-lg-3">
-            <div class="card">
-              <p class="card-header"><a href="{% url 'reviews:department_list' class.department.id %}">{{ class.department.college.name }} {{ class.department.name }}</a></p>
-              <p class="card-body"> {{ class.name }} 
-              <br>average recommended {{ class.average_rating | floatformat:2 }}<a href="{% url 'reviews:restaurant_detail' class.id %}"> Detail>></a></p>
-            </div>
-          </div>
+              <div class="card-body" style="background-color: white"><a style="color:black" href="{% url 'reviews:restaurant_detail' class.id %}"><strong><u>{{ class.department.college.name }} {{ class.name }}</u></strong></a>
+              <br>average recommended {{ class.average_rating | floatformat:2 }}</div>
     {% endfor %}
   </div>
-<p></p>
-<h5 class="card-title"><strong>Most helpful feedback</strong></h5>
-      <div class="row">
+
+  <div class="col-lg-3">
+    <h5 class="card-header text-primary">Most helpful feedback
+    </h5>
         {% for review in most_helpful%}
-          <div class="col-lg-3">
-            <div class="card">
-              <p class="card-header"><a href="{% url 'reviews:department_list' review.restaurant.department.id %}">{{ review.restaurant.department.college.name }} {{ review.restaurant.department.name }}</a></p>
-              <p class="card-body"> {{review.num_liked}} found {{ review.user_name }}'s feedback of {{ review.restaurant.name }} helpful 
-              <a href="{% url 'reviews:review_detail' review.id %}"> Detail>></a></p>
-            </div>
-          </div>
+              <div class="card-body" style="background-color: white"><a style="color:black" href="{% url 'reviews:review_detail' review.id %}"><strong><u>{{ review.title }}</u></strong></a>
+              <br>{{review.num_liked}} likes</div>
     {% endfor %}
   </div>
-<p></p>
-    <h5 class="card-title"><strong>Most active topic</strong></h5>
-      <div class="row">
+
+  <div class="col-lg-3">
+    <h5 class="card-header text-primary">Most popular post
+    </h5>
         {% for topic in most_active%}
-          <div class="col-lg-3">
-            <div class="card">
-              <p class="card-header"><a href="{% url 'reviews:department_list' topic.department.id %}">{{ topic.department.college.name }} {{ topic.department.name }}</a></p>
-              <p class="card-body"> <strong>{{ topic.title }}</strong> has {{ topic.num_likes }} likes <a href="{% url 'reviews:topic_detail' topic.id %}"> Detail>></a></p>
-            </div>
-          </div>
+              <div class="card-body" style="background-color: white"> <a style="color:black" href="{% url 'reviews:topic_detail' topic.id %}"><strong><u>{{ topic.title }}</strong></u></a>
+              <br>by {{topic.username}} | {{ topic.num_likes }} likes</div>
     {% endfor %}
   </div>
 <!--

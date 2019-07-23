@@ -50,7 +50,7 @@
   
 {% else %}
 {% endif %}
-<div class="card d-none d-sm-none d-md-block d-lg-block">
+<!-- <div class="card d-none d-sm-none d-md-block d-lg-block">
     <div class="card-header" id="headingFour">
       <h5 class="mb-0">
   
@@ -78,7 +78,7 @@
         </ul>
       </div>
     </div>
-  </div>
+  </div> -->
 
   <!--
   <div class="card d-none d-sm-none d-md-block d-lg-block">
@@ -231,10 +231,10 @@ You can choose to be anonymous when posting. ALL post contents are visible to {{
 <div class="card-header">
 <div class="d-flex justify-content-between text-primary">
 <div>
-<h2>Insider Threads</h2>
+<h2>Insides' Reviews</h2>
 </div>
 <div>
-<a href="{% url 'reviews:add_topic' department.id %}"><h5 class='text-white'><span class="badge badge-pill badge-primary">+ Add</span></h5></a>
+<!-- <a href="{% url 'reviews:add_topic' department.id %}"><h5 class='text-white'><span class="badge badge-pill badge-primary">+ Add</span></h5></a> -->
 
 </div>
 </div>
@@ -273,14 +273,14 @@ $('#like{{ result.id }}').on("click",function(){
     })
 </script>
       {% else %}
-        <div class="card">
+        <!-- <div class="card">
           <div class="card-body">
             <h5 class="text-primary"> {{ result.title }} </h5>
             <div class="text-secondary">{{ result.username }}; {{ result.pub_date }}</div>
             <strong>{{ result.content }}</strong>
-            <br><br><a href="{% url 'reviews:like_topic' result.id %}">Respond {{ result.response_set.count }}</a><a href="{% url 'reviews:like_topic' result.id %}">&nbsp &nbsp Like {{ result.get_like_counts }}</a><a onclick="return confirm('You will not see this review after reporting. Proceed?')" href="{% url 'reviews:report_topic' result.id %}">&nbsp &nbsp Report</a>
+            <br><br><a href="{% url 'reviews:like_topic' %}">Respond {{ result.response_set.count }}</a><a href="{% url 'reviews:like_topic'  %}">&nbsp &nbsp Like {{ result.get_like_counts }}</a><a onclick="return confirm('You will not see this review after reporting. Proceed?')" href="{% url 'reviews:report_topic' result.id %}">&nbsp &nbsp Report</a>
           </div>
-        </div>
+        </div> -->
       {% endif %}
     {% endfor %}
     {% else %}
@@ -301,6 +301,7 @@ The {{ department.college.name}} {{ department.name}} community is for any curre
 </div>
 </div>
 {% endif %}
+
 {% endif %}
 
 

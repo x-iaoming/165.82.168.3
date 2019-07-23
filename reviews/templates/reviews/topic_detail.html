@@ -5,18 +5,37 @@
 {% endblock %}
 
 {% block content %}
-<div class="card">
+
   <div class="card-header">
     <h3 class="text-primary">{{ topic.title }}</h3>
     <strong>{{ topic.username }}</strong> added a post in
 <a href="{% url 'reviews:department_list' topic.department.id %}" style="color:black"><strong>{{ topic.department.college.name }} {{ topic.department.name }}</strong></a><a class="text-secondary"> | {{ topic.pub_date }}</a>
   </div>
 
-<h5><a href="{% url 'reviews:like_topic' topic.id %}">Like</a></h5>
-<h5><a href="{% url 'reviews:report_topic' topic.id %}">Report</a></h5>
-<h5>{{ topic.content }}</h5>
+  <div class="card-body" style="background: white">
+    <h5>{{ topic.content }}</h5>
+    <button style="color:grey" type="button" class="btn btn-primary" name="{{ topic.id }}"><i class="far fa-thumbs-up"></i> {{ topic.get_like_counts }}</button>
+    <input style="color:grey" type="button" class="btn btn-primary" onclick="return confirm('You will not see this review after reporting. Proceed?')" href="{% url 'reviews:report_review' topic.id %}" value="Report"/>
+  </div>
+
 
 <br>
+<div class="card-body" style="background: white">
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>
+{% else %}
+<form action="{% url 'reviews:add_response' topic.id %}" method="post" class="form">
+{% csrf_token %}
+{% for field in form %}
+    {% bootstrap_field field %}
+{% endfor %}
+{% buttons %}
+<button type="submit" class="btn btn-primary">
+     Add Comment
+</button>
+{% endbuttons %}
+</form>
+{% endif %}
+
 {% if topic_response_list %}
 <div class="row">
     {% for response in topic_response_list %}
@@ -27,23 +46,10 @@
     {% endfor %}
 </div>
 {% else %}
-<p>Respond to {{ topic.user_name }} now!</p>
 {% endif %}
+<br>
 
-{% if error_message %}<p><strong>{{ error_message }}</strong></p>
-{% else %}
-<form action="{% url 'reviews:add_response' topic.id %}" method="post" class="form">
-{% csrf_token %}
-{% for field in form %}
-    {% bootstrap_field field %}
-{% endfor %}
-{% buttons %}
-<button type="submit" class="btn btn-primary">
-     Add Response
-</button>
-{% endbuttons %}
-</form>
-{% endif %}
+
 </div>
 
 {% endblock %}

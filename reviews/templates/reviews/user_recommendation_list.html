@@ -1,5 +1,231 @@
-{% extends 'restaurant_list.html' %}
+{% extends 'base.html' %}
+{% load bootstrap4 %}
 
 {% block title %}
-<h2>Recommendations for {{ username }}</h2>
+<script type = "text/javascript" src = "//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js" ></script>
+<script type="text/javascript">
+
+document.addEventListener('DOMContentLoaded',function(event){
+  // array with texts to type in typewriter
+  var dataText = [ "Hi {{ user.profile.username }}!", "I'm your AI squirrel advisor.", "Tell me about the classes you like","and I'll suggest other classes for you.","Test me out!"];
+  
+  // type one text in the typwriter
+  // keeps calling itself until the text is finished
+  function typeWriter(text, i, fnCallback) {
+    // chekc if text isn't finished yet
+    if (i < (text.length)) {
+      // add next character to h1
+     document.querySelector("#test").innerHTML = text.substring(0, i+1) +'<span id="animi" aria-hidden="true"></span>';
+
+      // wait for a while and call this function again for next character
+      setTimeout(function() {
+        typeWriter(text, i + 1, fnCallback)
+      }, 100);
+    }
+    // text finished, call callback if there is a callback function
+    else if (typeof fnCallback == 'function') {
+      // call callback after timeout
+      setTimeout(fnCallback, 700);
+    }
+  }
+  // start a typewriter animation for a text in the dataText array
+   function StartTextAnimation(i) {
+     if (typeof dataText[i] == 'undefined'){
+        setTimeout(function() {
+          StartTextAnimation(0);
+        }, 20000);
+     }
+     // check if dataText[i] exists
+    if (i < dataText[i].length) {
+      // text exists! start typewriter animation
+     typeWriter(dataText[i], 0, function(){
+       // after callback (and whole text has been animated), start next text
+       StartTextAnimation(i + 1);
+     });
+    }
+  }
+  // start the text animation
+  StartTextAnimation(0);
+});
+$(document).ready(function() {
+  $( "#target" ).click(function() {
+  $( "#top" ).hide();
+  $( this ).hide();
+  });
+});
+</script>
+{{ form.media.css }}
+{% endblock %}
+
+
+{% block content %}
+<style>
+
+#animi {
+  border-right: .05em solid;
+  animation: caret 1s steps(1) infinite;
+}
+
+@keyframes caret {
+  50% {
+    border-color: transparent;
+  }
+}
+</style>
+<div id="target" class="btn btn-sm btn-outline-primary float-right" align="right">
+  Hide
+</div>
+<div align="center" id="top">
+<img src='https://media1.tenor.com/images/67a2dac4db05a85a6653d2e2a6c43f21/tenor.gif' alt='squirrel'>
+<h1 id="test"></h1>
+</div>
+<hr>
+<div class="row">
+<div class="col-lg-8">
+
+<h4><i class="far fa-hand-point-down"></i> Review the classes you've taken:</h4>
+
+<form action="{% url 'reviews:user_recommendation_list' %}" method="post" class="form" style="margin-bottom: 0em">
+          {% csrf_token %}
+          <div class="card-header">
+            <p class="text-primary"><i>*Please remember to <strong>click confirm</strong> after typing in college and department</i></p>
+            <div class="row">
+          	<div class="col-sm-5">
+          {% bootstrap_field form.college %}
+            </div>
+            <div class="col-sm-5">
+          {% bootstrap_field form.department %}
+            </div>
+            <div class="col-sm-2">
+              {% buttons %}
+              <button type="submit" class="btn btn-raised btn-primary btn-sm" >
+              Confirm
+              </button>
+              {% endbuttons %}
+            </div>
+        </div>
+          </div>
+</form>
+
+<div class="container">
+<form action="{% url 'reviews:add_review' department.id%}" method="post" class="form" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="fieldWrapper" >
+        {{ form2.non_field_errors }}
+        <div class="row card-body" style="background-color: white;margin-bottom: 0px;padding-bottom:0px">
+          <p class="text-primary"><i>*Your review is fully <strong>anonymous</strong> and only visible to insiders.</i></p>
+        	<div class="col-sm-5">
+        {% bootstrap_field form2.restaurant %}
+            </div>
+            <div class="col-sm-5">
+        {% bootstrap_field form2.prof_name %}
+            </div>
+            <div class="col-sm-2">
+        {% bootstrap_field form2.rating %}
+            </div>
+        </div>
+        <div class="row card-body" style="background-color: white; padding-top:0px">
+        	<div class="col-sm-10">
+        {% bootstrap_field form2.comment %}
+            </div>
+            <div class="col-sm-2">
+            	{% buttons %}
+                <button type="submit" class="btn btn-raised btn-primary btn-sm">
+                Add
+                </button>
+              {% endbuttons %}
+            </div>
+        </div>
+    </div>
+    
+ </form>
+</div>
+
+<h4><i class="far fa-hand-point-down"></i> Your class reviews</h4>
+
+{% if latest_review_list %}
+<div class="row">
+  {% for review in latest_review_list %}
+    <div class="col-sm-6">
+      <div class="card-header">
+        <a href="{% url 'reviews:department_list' review.restaurant.department.id %}"><u> {{review.restaurant.department.college.name}} {{ review.restaurant.department.name }} </u></a>
+      </div>
+      <div class="card-body" id="like{{ review.id }}" name="{{ review.id }}" style="background-color: white;padding-bottom: 0px">
+
+            <h6>You liked <a style="color:black" href="{% url 'reviews:restaurant_detail' review.restaurant.id %}"><u>{{ review.restaurant.name }}</u></a> with {{ review.prof_name }} {{ review.rating }} / 5</h6>
+            {{ review.comment }}
+            <br>
+            {% if user.is_authenticated %}
+            <h6 style="color: grey">
+            <a class="btn btn-secondary btn-sm"><i class="far fa-thumbs-up"></i> | {{ review.get_like_counts }}</a>
+            <a class="btn btn-secondary btn-sm" href="{% url 'reviews:edit_review' review.id %}">
+            <i class="fa fa-pen"></i>
+            </a>
+            <a class="btn btn-secondary btn-sm" onclick="return confirm('Are you sure you want to delete this?')" href="{% url 'reviews:delete_review' review.id %}">
+            <i class="fa fa-times"></i>
+            </a>
+            </h6>
+
+            {% else %}
+            {% endif %}
+      </div>
+    </div>
+  {% endfor %}
+      </div>
+
+      {% else %}
+        <p><a href="{% url 'reviews:add_general_review'%}"><u>Write some feedbacks</u></a> for the classes you've taken ☜(˚▽˚)☞</p>
+ {% endif %}
+</div>
+
+<div class="col-lg-4">
+<h4><i class="far fa-hand-point-down"></i> And I guess you will like:</h4>
+
+<div class="card-body text-secondary" style="background-color: white;">
+<i class="text-primary">*The more reviews you write, the more accurate I become</i>
+</div>
+<p></p>
+
+{% if restaurant_list %}
+
+    {% for restaurant in restaurant_list %}
+    <div class="card-header">
+        <a href="{% url 'reviews:restaurant_detail' restaurant.id %}"><u>
+        {{ restaurant.name }}
+        </u></a>
+    </div>
+    <div class="card-body" style="background-color: white">
+        <h6>{{ restaurant.review_set.count }} reviews</h6>
+        <h6>{{ restaurant.average_rating | floatformat }} average liking</h6>
+    </div>
+
+    {% endfor %}
+{% else %}
+    <p>No restaurants are available.</p>
+{% endif %}
+
+</div>
+    <p></p>
+
+<!-- <h4>Find class by department</h4>
+<div class="card-body" style="background-color: white">
+        {% if error_message %}<p><strong>{{ error_message }}</strong></p>
+        {% else %}
+          <form action="{% url 'reviews:department_list_all'%}" method="post" class="form">
+          {% csrf_token %}
+          {% for field in form %}
+          {% bootstrap_field field %}
+          {% endfor %}
+          {% buttons %}
+          <button type="submit" class="btn btn-raised btn-primary" >
+          Go
+          </button>
+          {% endbuttons %}
+          </form>
+        {% endif %}
+ </div> -->
+
+</div>
+</div>
+{{ form.media.js }}
 {% endblock %}

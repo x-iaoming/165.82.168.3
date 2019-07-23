@@ -1,78 +1,252 @@
 {% extends 'base.html' %}
-
-
+{% load bootstrap4 %}
 {% block title %}
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+{{ form.media.css }}
 {% endblock %}
-
 {% block content %}
 <div class="row">
-  <div class="col-md-3" >
-  	<div class="d-none d-sm-none d-md-block d-lg-block">
-  	<div class="card">
-      <div class="card-header" id="headingFour">
-        <h5 class="mb-0">
-        <div class="d-flex justify-content-between text-primary">
-          <div>
-        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseFour" aria-expanded="false" aria-controls="collapseOne"> My Groups <i class="fa fa-angle-down"></i>
+  <div class="col-md-3">
+    <div class="card-header text-primary">
+      <h4>Are you looking for reviews for a class?</h4>
+    </div>
+    <div class="card-body" align="center" style="background-color: white">
+      {% if error_message %}
+      <p><strong>{{ error_message }}</strong></p>
+      {% else %}
+      <form action="{% url 'reviews:department_list_all'%}" method="post" class="form">
+        {% csrf_token %}
+        {% for field in form %}
+        {% bootstrap_field field %}
+        {% endfor %}
+        {% buttons %}
+        <button type="submit" class="btn btn-raised btn-primary" >
+        Go
         </button>
+        {% endbuttons %}
+      </form>
+      {% endif %}
+    </div>
+    <div class="card-header text-primary">
+      <h4>Your groups</h4>
+    </div>
+    {% if user.is_authenticated %}
+    {% if sub_dept_list %}
+    {% for sub in sub_dept_list %}
+    <div class="card-body" style="background-color: white "><a style="color:black" href="{% url 'reviews:department_list' sub.id%}"><strong><u>{{ sub.college.name }} {{ sub.name }}</u></strong></a>
+      <br><a style="font-size: 13px">{{ sub.sub.count}} Insiders</a>
+      <br>{{ sub.tagline}}
+    </div>
+    {% endfor %}
+    {% else %}
+    {% endif %}
+    {% else %}
+    <p class="card-body" style="background-color: white "><a href="{% url 'auth:login' %}">Please <u>login</u> to get updates specific for you ʕ•ᴥ•ʔ</a></p>
+    {% endif %}
+  </div>
+
+
+  <div class="col-md-6">
+    
+      <h3 class="text-primary card-header">Latest reviews in your groups</h3>
+      <p></p>
+      <!-- <div id="headingFour">
+        <h5 class="mb-0">
+          <div class="d-flex justify-content-between">
+            <div>
+              You can only see reviews in departments you've followed.
+              <button class="btn " type="button" data-toggle="collapse" data-target="#collapseFour" aria-expanded="false" aria-controls="collapseOne"> <i class="fa fa-angle-down"></i>
+              </button>
+            </div>
+            <div>
+              <a href="{% url 'reviews:review_list'%}"><h5 class='text-white'><span class="badge badge-pill badge-primary">+ Explore </span></h5></a>
+            </div>
           </div>
-          <div>
-        <a href="{% url 'reviews:review_list'%}"><h5 class='text-white'><span class="badge badge-pill badge-primary">+ Explore </span></h5></a>
-          </div>
-        </div>
         </h5>
-      </div>
-      <div id="collapseFour" class="collapse show" aria-labelledby="headingFour" data-parent="#accordion">
-        <div class="card-body">
+        </div>
+        
+        <div id="collapseFour" class="collapse" aria-labelledby="headingFour" data-parent="#accordion">
+        <div class="card-body" style="background-color: white">
           <ul class="list-group list-group-flush">
-          {% if user.is_authenticated %}
-          {% if sub_dept_list %}
-          {% for sub in sub_dept_list %}
+            {% if user.is_authenticated %}
+            {% for sub in sub_dept_list %}
             <li class="list-group-item"><a class="text-secondary" href="{% url 'reviews:department_list' sub.id%}">{{ sub.college.name }} {{ sub.name }}</a></li>
-          {% endfor %}
-          {% else %}
-          {% endif %}
-          {% else %}
+            {% endfor %}
+            {% else %}
             <p><a href="{% url 'auth:login' %}" class="text-secondary">Please <u>login</u> to get updates specific for you ʕ•ᴥ•ʔ</a></p>
           {% endif %}
-        </ul>
+          </ul>
         </div>
+        </div> -->
+      {% for result in result_list %}
+      {% if result.is_review %}
+      <div class="card-header" style="padding-bottom: 0px">
+        <strong>I'm recommending <a style="color:black" href="{% url 'reviews:restaurant_detail' result.restaurant.id %}"><u>{{ result.restaurant.name }}</u></a> in <a style="color:black" href="{% url 'reviews:department_list' result.restaurant.department.id %}"><u>{{ result.restaurant.department.college.name }} {{ result.restaurant.department.name }}</u></a> {{ result.rating}} / 5</strong>
+        <p style="color:grey;font-size: 12px"> Anonymous | {{ result.pub_date }}</p>
       </div>
-    </div>
-
-    <div class="card">
-    <div class="card-header" id="headingThree">
-      <h5 class="mb-0">
-        <div class="d-flex justify-content-between text-primary">
-          <div>
-        <button class="btn btn-primary collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-          My Reviews <i class="fa fa-angle-down"></i>
-        </button>
-          </div>
-          <div>
-        <a href="{% url 'reviews:add_general_review'%}"><h5 class='text-white'><span class="badge badge-pill badge-primary">+ Add </span></h5></a>
-          </div>
+      <div class="card-body" style="background-color: white;padding-bottom: 0px">
+        {% if user.is_authenticated %}
+        {{ result.comment }}
+        <!-- Testing -->
+        <div id="count{{ result.id }}" >
+          <button style="color:grey" type="button" class="btn btn-primary btn-sm" id="like{{ result.id }}" name="{{ result.id }}">
+          <i class="far fa-thumbs-up"></i> {{ result.get_like_counts }}</button>
+          <button style="color:grey" id="{{ result.id }}" class="btn btn-primary">&#9873</button>
         </div>
-      </h5>
-    </div>
+        <script>
+          $('#like{{ result.id }}').on("click",function(){
+           
+                $.ajax({
+                         type: "POST",
+                         url: "{% url 'reviews:like_review' %}",
+                         data: {'review_id': $(this).attr('name'), 'csrfmiddlewaretoken': '{{ csrf_token }}'},
+                         dataType: "json",
+                         success: function() {
+                          $("#count{{ result.id }}").load(window.location.href + " #count{{ result.id }}");
+                          },
+                         error: function(rs, e) {
+                              alert(rs.responseText);
+                          }
+                    }); 
+              })
+          $('#{{ result.id }}').on("click",function(){
+             if (confirm('You will not see this review after reporting it. Continue?')){
+                $.ajax({
+                         type: "POST",
+                         url: "{% url 'reviews:report_review' %}",
+                         data: {'review_id': $(this).attr('id'), 'csrfmiddlewaretoken': '{{ csrf_token }}'},
+                         dataType: "json",
+                         success: function() {
+                              location.reload()
+                          },
+                         error: function(rs, e) {
+                              alert(rs.responseText);
+                          }
+                    }); 
+                }
+              })
+        </script>
+        <!-- Testing -->
+      </div>
+      {% else %}
+      <div class="text-secondary">Details hidden. Login to view.</div></div>
+      {% endif %}
+      {% else %}
+      <!-- <div class="card-header">
+        <strong>{{ result.username }}</strong> added a post in <a href="{% url 'reviews:department_list' result.department.id %}" style="color:black"><strong>{{ result.department.college.name }} {{ result.department.name }}</strong></a>
+        <a style="color:grey"> | {{ result.pub_date }}</a>
+        </div>
+        <div class="card-body" style="background-color: white">
+        <h5 class="text-primary"><a href="{% url 'reviews:topic_detail' result.id %}"> {{ result.title }} </a></h5>
+        {% if user.is_authenticated %}
+        {{ result.content }}
+        
+        <div id="countT{{ result.id }}">
+        <button style="color:grey" type="button" class="btn btn-primary" id="likeT{{ result.id }}" name="{{ result.id }}">
+        <i class="far fa-thumbs-up"></i> {{ result.get_like_counts }}</button>
+        <input style="color:grey" type="button" class="btn btn-primary" onclick="return confirm('You will not see this review after reporting. Proceed?')" href="{% url 'reviews:report_topic' result.id %}" value="Report"/>
+        </div>   
+        
+        <script>
+        $('#likeT{{ result.id }}').on("click",function(){
+        $.ajax({
+           type: "POST",
+           url: "{% url 'reviews:like_topic' %}",
+           data: {'topic_id': $(this).attr('name'), 'csrfmiddlewaretoken': '{{ csrf_token }}'},
+           dataType: "json",
+           success: function() {
+            $("#countT{{ result.id }}").load(window.location.href + " #countT{{ result.id }}");
+            },
+           error: function(rs, e) {
+                alert(rs.responseText);
+            }
+        }); 
+        
+        })
+        </script>
+        <a href="{% url 'reviews:add_response' result.id%}">Respond {{ result.response_set.count }}</a>
+        {% else %}
+        <br><div class="text-secondary">Details hidden. Login to view.</div>
+        {% endif %} -->
 
-    <div id="collapseThree" class="collapse show" aria-labelledby="headingThree" data-parent="#accordion">
-      <div class="card-body">
-        {% if user_review_list %}
+    {% endif %}
+    <p></p>
+    {% endfor %}
+    <!-- <div class="card-body text-secondary" style="background-color: white" >
+      <div class="pagination">
+      <span class="step-links">
+          {% if result_list.has_previous %}
+              <a href="?page=1">&laquo; First&nbsp</a>
+              <a href="?page={{ result_list.previous_page_number }}">Previous&nbsp</a>
+          {% endif %}
+      
+          <span class="current">
+              Page {{ result_list.number }} of {{ result_list.paginator.num_pages }}.
+          </span>
+      
+          {% if result_list.has_next %}
+              <a href="?page={{ result_list.next_page_number }}">&nbspNext</a>
+              <a href="?page={{ result_list.paginator.num_pages }}">&nbspLast &raquo;</a>
+          {% endif %}
+      </span>
+      </div>
+      </div> -->
+  </div>
+
+
+  <div class="col-md-3" >
+    <div class="d-none d-sm-none d-md-block d-lg-block">
+      <h4 class="card-header text-primary">Popular groups
+      </h4>
+      {% for dept in most_followed %}
+      <div class="card-body" style="background-color: white"><a style="color:black" href="{% url 'reviews:department_list' dept.id%}"><strong><u>{{ dept.college.name }} {{ dept.name }}</u></strong></a>
+        <br><a style="font-size: 13px">{{ dept.sub.count}} Insiders</a>
+        <br>{{ dept.tagline}}
+      </div>
+      {% endfor %}
+      <h4 class="card-header text-primary">Best classes
+      </h4>
+      {% for class in most_recommended %}
+      <div class="card-body" style="background-color: white"><a style="color:black" href="{% url 'reviews:restaurant_detail' class.id %}"><strong><u>{{ class.department.college.name }} {{ class.name }}</u></strong></a>
+        <br>average recommended {{ class.average_rating | floatformat:2 }}
+      </div>
+      {% endfor %}
+      <!-- <h4 class="card-header text-primary">Most helpful reviews
+      </h4>
+      {% for review in most_helpful%}
+      <div class="card-body" style="background-color: white;padding-bottom: 0px"><a style="color:black" href="{% url 'reviews:review_detail' review.id %}"><strong><u>{{ review.restaurant.department.college.name }} {{ review.restaurant.name }}</u></strong></a>
+        <br>{{review.num_liked}} likes
+      </div>
+      {% endfor %} -->
+      <!--  <div class="card-header" id="headingThree">
+        <h5 class="mb-0">
+          <div class="d-flex justify-content-between text-primary">
+            <div>
+              <button class="btn btn-primary collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+               My Reviews <i class="fa fa-angle-down"></i>
+              </button>
+            </div>
+            <div>
+              <a href="{% url 'reviews:add_general_review'%}"><h5 class='text-white'><span class="badge badge-pill badge-primary">+ Add </span></h5></a>
+            </div>
+          </div>
+        </h5>
+        </div>
+        
+        <div id="collapseThree" class="collapse show" aria-labelledby="headingThree" data-parent="#accordion">
+        <div class="card-body" style="background-color: white">
+          {% if user_review_list %}
           {% for review in user_review_list %}
             <li class="list-group-item"><a class="text-secondary" href="{% url 'reviews:review_detail' review.id%}">{{ review.restaurant.name }} |  {{review.rating}} / 5 </a></li>
           {% endfor %}
           {% else %}
           {% endif %}
-      </div>
+        </div>
+        </div> -->
     </div>
-  </div>
-  </div>
-<!-- I don't want to repeat but right now I'm leaving it like this -->
-  <div class="d-block d-sm-block d-md-none d-lg-none">
-  	<div class="card">
-      <div class="card-header" id="headingFour">
+    <!-- I don't want to repeat but right now I'm leaving it like this -->
+    <div class="d-block d-sm-block d-md-none d-lg-none">
+      <!-- <div class="card-header" id="headingFour">
         <h5 class="mb-0">
           <div class="d-flex justify-content-between text-primary">
             <div>
@@ -84,151 +258,52 @@
             </div>
           </div>
         </h5>
-      </div>
+        </div> -->
       <div id="collapse4" class="collapse" aria-labelledby="headingFour" data-parent="#accordion">
-        <div class="card-body">
+        <div class="card-body" style="background-color: white">
           <ul class="list-group list-group-flush">
-          {% if user.is_authenticated %}
-          {% if sub_dept_list %}
-          {% for sub in sub_dept_list %}
+            {% if user.is_authenticated %}
+            {% if sub_dept_list %}
+            {% for sub in sub_dept_list %}
             <li class="list-group-item"><a class="text-secondary" href="{% url 'reviews:department_list' sub.id%}">{{ sub.college.name }} {{ sub.name }}</a></li>
-          {% endfor %}
-          {% else %}
-          {% endif %}
-          {% else %}
+            {% endfor %}
+            {% else %}
+            {% endif %}
+            {% else %}
             <p><a href="{% url 'auth:login' %}">Please <u>login</u> to get updates specific for you ʕ•ᴥ•ʔ</a></p>
-          {% endif %}
-        </ul>
+            {% endif %}
+          </ul>
         </div>
       </div>
-    </div>
-
-    <div class="card">
-    <div class="card-header" id="headingThree">
-      <h5 class="mb-0">
-        <div class="d-flex justify-content-between text-primary">
-          <div>
-        <button class="btn btn-primary collapsed" data-toggle="collapse" data-target="#collapse3" aria-expanded="false" aria-controls="collapseThree">
-          My Reviews <i class="fa fa-angle-down"></i>
-        </button>
-          </div>
-          <div>
-        <a href="{% url 'reviews:add_general_review'%}"><h5 class='text-white'><span class="badge badge-pill badge-primary">+ Add </span></h5></a>
+      <!-- <div class="card-header" id="headingThree">
+        <h5 class="mb-0">
+          <div class="d-flex justify-content-between text-primary">
+            <div>
+          <button class="btn btn-primary collapsed" data-toggle="collapse" data-target="#collapse3" aria-expanded="false" aria-controls="collapseThree">
+            My Reviews <i class="fa fa-angle-down"></i>
+          </button>
+            </div>
+            <div>
+          <a href="{% url 'reviews:add_general_review'%}"><h5 class='text-white'><span class="badge badge-pill badge-primary">+ Add </span></h5></a>
+             </div>
            </div>
-         </div>
-      </h5>
-    </div>
-
-    <div id="collapse3" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
-      <div class="card-body">
-        {% if user_review_list %}
-          {% for review in user_review_list %}
-            <li class="list-group-item"><a class="text-secondary" href="{% url 'reviews:review_detail' review.id%}">{{ review.restaurant.name }} |  {{review.rating}} / 5 </a></li>
-          {% endfor %}
-          {% else %}
-          {% endif %}
-      </div>
-    </div>
-  </div>
-  </div>
-
-<!-- I don't want to repeat but right now I'm leaving it like this -->
-
-    <p></p>
-  </div>
-
-  <div class="col-md-9">
-  	<div class="bg-white">
-      <div class="card-header">
-        {% if user.is_authenticated %}
-        <h3 class="text-primary">Hello {{ user.profile.username }}! What's up </h3>
-        {% else %}
-      	<h3 class="text-primary">What's up </h3>
-        {% endif %}
-      </div>
-      {% for result in result_list %}
-      <div class="card">
-        {% if result.is_review %}
-          <div class="card-header">
-    	        <strong>{{ result.user_name }}</strong> added a review in <a style="color:black" href="{% url 'reviews:department_list' result.restaurant.department.id %}"><strong>{{ result.restaurant.department.college.name }} {{ result.restaurant.department.name }}</strong></a>
-              <a style="color:grey"> | {{ result.pub_date }}</a>
-          </div>
-          <div class="card-body">
-            <h5 class="text-primary"><a href="{% url 'reviews:review_detail' result.id %}"> {{ result.title }} </a></h5>
-            {% if user.is_authenticated %}
-              {{ result.comment }}
-
-
-<!-- Testing -->
-  <div id="count{{ result.id }}">
-            <button style="color:grey" type="button" class="btn btn-primary" id="like{{ result.id }}" name="{{ result.id }}">
-            <i class="far fa-thumbs-up"></i> {{ result.get_like_counts }}</button>
-            <input style="color:grey" type="button" class="btn btn-primary" onclick="return confirm('You will not see this review after reporting. Proceed?')" href="{% url 'reviews:report_review' result.id %}" value="Report"/>
-  </div>   
-
-<script>
-$('#like{{ result.id }}').on("click",function(){
-      $.ajax({
-               type: "POST",
-               url: "{% url 'reviews:like_review' %}",
-               data: {'review_id': $(this).attr('name'), 'csrfmiddlewaretoken': '{{ csrf_token }}'},
-               dataType: "json",
-               success: function() {
-               	$("#count{{ result.id }}").load(window.location.href + " #count{{ result.id }}");
-                },
-               error: function(rs, e) {
-                    alert(rs.responseText);
-                }
-          }); 
-      
-    })
-</script>
-
-<!-- Testing -->
-
+        </h5>
+        </div>
+        
+        <div id="collapse3" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
+        <div class="card-body">
+          {% if user_review_list %}
+            {% for review in user_review_list %}
+              <li class="list-group-item"><a class="text-secondary" href="{% url 'reviews:review_detail' review.id%}">{{ review.restaurant.name }} |  {{review.rating}} / 5 </a></li>
+            {% endfor %}
             {% else %}
-              <br><div class="text-secondary">Details hidden. Login to view.</div>
             {% endif %}
-          </div>
-        {% else %}
-          <div class="card-header">
-            <strong>{{ result.username }}</strong> added a post in <a href="{% url 'reviews:department_list' result.department.id %}" style="color:black"><strong>{{ result.department.college.name }} {{ result.department.name }}</strong></a>
-            <a style="color:grey"> | {{ result.pub_date }}</a>
-          </div>
-          <div class="card-body">
-            <h5 class="text-primary"><a href="{% url 'reviews:topic_detail' result.id %}"> {{ result.title }} </a></h5>
-          {% if user.is_authenticated %}
-            {{ result.content }}
-            <br><br><a href="{% url 'reviews:like_topic' result.id %}">Respond {{ result.response_set.count }}</a><a href="{% url 'reviews:like_topic' result.id %}">&nbsp &nbspLike {{ result.get_like_counts }}</a><a onclick="return confirm('You will not see this review after reporting. Proceed?')" href="{% url 'reviews:report_topic' result.id %}">&nbsp &nbsp Report</a>
-          {% else %}
-          <br><div class="text-secondary">Details hidden. Login to view.</div>
-    {% endif %}
+        </div>
+        </div> -->
     </div>
-{% endif %}
-</div>
-<p></p> 
-{% endfor %}
-
-<div class="card">
-  <div class="card-body text-secondary">
-    <div class="pagination">
-    <span class="step-links">
-        {% if result_list.has_previous %}
-            <a href="?page=1">&laquo; First&nbsp</a>
-            <a href="?page={{ result_list.previous_page_number }}">Previous&nbsp</a>
-        {% endif %}
-
-        <span class="current">
-            Page {{ result_list.number }} of {{ result_list.paginator.num_pages }}.
-        </span>
-
-        {% if result_list.has_next %}
-            <a href="?page={{ result_list.next_page_number }}">&nbspNext</a>
-            <a href="?page={{ result_list.paginator.num_pages }}">&nbspLast &raquo;</a>
-        {% endif %}
-    </span>
-    </div>
+    <p></p>
+    <!-- I don't want to repeat but right now I'm leaving it like this -->
   </div>
 </div>
-</div>
+{{ form.media.js }}
 {% endblock %}

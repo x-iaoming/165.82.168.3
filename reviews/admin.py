@@ -10,8 +10,8 @@ class ProfileAdmin(admin.ModelAdmin):
 
 class ReviewAdmin(admin.ModelAdmin):
     model = Review
-    list_display = ('restaurant','rating','user_name','prof_name','comment','title',
-        'pub_date','assessment','work_load','diff_level','get_report_counts','get_like_counts','syllabus')
+    list_display = ('user','restaurant','rating','prof_name','comment',
+        'pub_date','get_users_reported','get_like_counts')
     list_filter = ['pub_date','user_name','work_load','prof_name','diff_level']
     search_fields = ['comment']
 

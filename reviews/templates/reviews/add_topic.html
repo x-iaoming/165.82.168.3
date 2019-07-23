@@ -5,45 +5,43 @@
 {% endblock %}
 
 {% block content %}
-<div class="card">
+
 	<div class="card-header">
-<h3><a href="{% url 'reviews:department_list' department.id %}"> {{ department.college.name }} {{ department.name }}</a></h3>
+<h3>Post something in {{ department.college.name }} {{ department.name }}</h3>
+<div class="text-secondary">Writing a class review?
+    <a class="text-secondary" href="{% url 'reviews:add_review' department.id %}"><strong> Click here</strong></a></div>
     </div>
-    <div class="card-body">
+
+<p></p>
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
 <form action="{% url 'reviews:add_topic' department.id %}" method="post" class="form" enctype="multipart/form-data">
     {% csrf_token %}
     <div class="fieldWrapper">
       <div class="row">
-        <div class="col-md-4" >
-            <div class="card">
-            <div class="card-header">
-                <a href="{% url 'reviews:add_review' department.id %}">
-                + Writing a class feedback? Click here
-              </a>
-            </div>
-            </div>
-        </div>
         <div class="col-md-8" >
-            <div class="card">
-            <div class="card-body">
+   
+            <div class="card-body" style="background-color: white">
         {{ form.non_field_errors }}
         {{ form.title.errors }}
         {% bootstrap_field form.title %}
         {% bootstrap_field form.username %}
         {% bootstrap_field form.content %}
             </div>
-            </div>
+ 
+        </div>
+        <div class="col-md-4" >
+            
         </div>
       </div>
     </div>
+    <p></p>
     {% buttons %}
     <button type="submit" class="btn btn-raised btn-primary">
     Add
     </button>
     {% endbuttons %}
     </form>
-   </div>
-</div>
+
+
 {% endblock %}

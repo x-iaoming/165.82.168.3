@@ -10,7 +10,7 @@ urlpatterns = [
     #path('ajax/load-restaurants/', views.load_restaurants, name='ajax_load_restaurants'), # <-- this one here
     
     # ex: /
-    url(r'^$', views.review_list, name='review_list'),
+    url(r'^explore$', views.review_list, name='review_list'),
     url(r'^latest$', views.latest, name='latest'),
     url(r'^redirect$', views.redirect, name='redirect'),
     url(r'^denied/(?P<department_id>[0-9]+)/$', views.denied, name='denied'),
@@ -43,13 +43,13 @@ urlpatterns = [
      url(r'^class/add_a_review/$', views.add_a_review, name='add_a_review'),
     url(r'^review/(?P<review_id>[0-9]+)/edit/$', views.edit_review, name='edit_review'),
     url(r'^review/(?P<review_id>[0-9]+)/delete/$', views.delete_review, name='delete_review'),
-    url(r'^review/(?P<review_id>[0-9]+)/report/$', views.report_review, name='report_review'),
+    url(r'^review/report/$', views.report_review, name='report_review'),
     url(r'^review/like/$', views.like_review, name='like_review'),
 
     url(r'^topic/(?P<topic_id>[0-9]+)/edit/$', views.edit_topic, name='edit_topic'),
     url(r'^topic/(?P<topic_id>[0-9]+)/delete/$', views.delete_topic, name='delete_topic'),
     url(r'^topic/(?P<topic_id>[0-9]+)/report/$', views.report_topic, name='report_topic'),
-    url(r'^topic/(?P<topic_id>[0-9]+)/like/$', views.like_topic, name='like_topic'),
+    url(r'^topic/like/$', views.like_topic, name='like_topic'),
 
     #url(r'^user/(?P<username>\w+)/$', views.user_review_list, name='user_review_list'),
     url(r'^user/$', views.user_profile, name='user_profile'),

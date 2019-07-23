@@ -6,12 +6,12 @@
 {% block content %}
 <script type = "text/javascript" src = "//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js" ></script>
 {{ form.media.css }}
-<div class="card">
+
   <div class="card-header text-primary">
-    <h2>Add a Class Feedback</h2>
+    <h2>Add a Class Review</h2>
     <h6>which department is the class in?</h6>
   </div>
-  <div class="card-body" align="center">
+  <div class="card-body" align="center" style="background-color: white">
     {% if error_message %}<p><strong>{{ error_message }}</strong></p>
         {% else %}
           <form action="{% url 'reviews:add_general_review' %}" method="post" class="form">
@@ -27,7 +27,7 @@
           </form>
         {% endif %}
   </div>
-</div>
+
 {{ form.media.js }}
 {% endblock %}
 

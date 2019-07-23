@@ -6,23 +6,24 @@
 {% block content %}
 <script type = "text/javascript" src = "//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js" ></script>
 {{ form.media.css }}
-<div class="card">
+
   <div class="card-header text-primary">
-    <h3><a href="{% url 'reviews:department_list' department.id %}"> {{ department.college.name }} {{ department.name }}</a></h3>
-    <div class="text-secondary">Do you have a question related to {{ department.name }}? Would you just like to share something not in the form of a class feedback?
-    <br><a class="text-secondary" href="{% url 'reviews:add_topic' department.id %}"><u> Click here to add a post in the {{ department.college.name }} {{ department.name }}>></u></a></div>
+    <h3>Write a review for {{ department.college.name }} {{ department.name }}</h3>
+    <div class="text-secondary">Not writing a review? Just wanna post something?
+    <a class="text-secondary" href="{% url 'reviews:add_topic' department.id %}"><strong> Click here</strong></a></div>
   </div>
-  <div class="card-body">
+
+<p></p>
     <form action="{% url 'reviews:add_review' department.id %}" method="post" class="form" enctype="multipart/form-data">
     {% csrf_token %}
     <div class="fieldWrapper">
       <div class="row">
         <div class="col-md-4" >
-          <div class="card">
+          
             <div class="card-header">
               <h3>Class Info</h3>
             </div>
-            <div class="card-body">
+            <div class="card-body" style="background-color: white">
         {{ form.non_field_errors }}
         {{ form.restaurant.errors }}
         {% bootstrap_field form.restaurant %}
@@ -33,31 +34,32 @@
         {% bootstrap_field form.assessment %}
         {% bootstrap_field form.syllabus %}
             </div>
-          </div>
+          
         </div>
         <div class="col-md-8" >
-          <div class="card">
+          
             <div class="card-header">
               <h3>Class Feedback</h3>
             </div>
-            <div class="card-body">
+            <div class="card-body" style="background-color: white">
         {{ form.non_field_errors }}
         {{ form.title.errors }}
         {% bootstrap_field form.title %}
         {% bootstrap_field form.user_name %}
         {% bootstrap_field form.comment %}
             </div>
-          </div>
+          
         </div>
       </div>
     </div>
+    <p></p>
     {% buttons %}
     <button type="submit" class="btn btn-raised btn-primary">
     Add
     </button>
     {% endbuttons %}
     </form>
-  </div>
-</div>
+
+
 {{ form.media.js }}
 {% endblock %}

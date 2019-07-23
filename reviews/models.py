@@ -33,7 +33,7 @@ class Department(models.Model):
 class Restaurant(models.Model):
     name = models.CharField(max_length=200)
     department = models.ForeignKey(Department, on_delete=models.CASCADE, null=True)
-    done = models.ManyToManyField(User,related_name='done',blank=True)
+    #done = models.ManyToManyField(User,related_name='done',blank=True)
 
     def average_rating(self):
         all_ratings = map(lambda x: x.rating, self.review_set.all())
@@ -43,9 +43,9 @@ class Restaurant(models.Model):
         all_diff = map(lambda x: x.diff_level, self.review_set.all())
         return np.mean(list(all_diff))
 
-    def average_wl(self):
-        all_wl = map(lambda x: x.work_load, self.review_set.all())
-        return np.mean(list(all_wl))
+    # def average_wl(self):
+    #     all_wl = map(lambda x: x.work_load, self.review_set.all())
+    #     return np.mean(list(all_wl))
 
     def __str__(self):
         return self.name
@@ -100,7 +100,7 @@ class Review(models.Model):
     #     (False,'False'),
     #     (True,'True:Your username is NOT recorded.You CANNOT modify this review later!!'),
     # )
-    slug = models.SlugField(null=True)
+    #slug = models.SlugField(null=True)
 
     restaurant = models.ForeignKey(Restaurant,on_delete=models.SET_NULL, null=True)
     #college = models.ForeignKey(College,on_delete=models.SET_NULL, null=True)
@@ -108,21 +108,21 @@ class Review(models.Model):
     users_reported = models.ManyToManyField(User,blank=True)
     users_liked = models.ManyToManyField(User,related_name='likes',blank=True)
     
-    user = models.ManyToManyField(User,related_name='user')
+    user = models.ForeignKey(User,related_name='user',on_delete=models.SET_NULL, null=True)
     pub_date = models.DateTimeField('date published',auto_now_add=True)
-    user_name = models.CharField(max_length=100)
+    user_name = models.CharField(max_length=100,blank=True, null=True)
     prof_name = models.CharField(max_length=100,default='')
-    title = models.CharField(max_length=50,blank=True, null=True)
+    # title = models.CharField(max_length=50,blank=True, null=True)
     comment = models.CharField(max_length=800)
     #pre_req = models.CharField(max_length=100,default='')
     #materials = models.CharField(max_length=100,default='')
     #anonymous = models.BooleanField(choices=ANONY,default=False)
 
     rating = models.IntegerField(choices=RATING_CHOICES,default=5)
-    assessment = models.CharField(max_length=50,default='')
-    #class_size = models.IntegerField(choices=CLASS_SIZE,blank=True,null=True)
-    work_load = models.IntegerField()
-    diff_level = models.IntegerField(choices=DIFF_LEVEL,default=2)
+    # assessment = models.CharField(max_length=50,default='')
+    # #class_size = models.IntegerField(choices=CLASS_SIZE,blank=True,null=True)
+    work_load = models.IntegerField(null=True,blank=True)
+    diff_level = models.IntegerField(choices=DIFF_LEVEL,blank=True, null=True)
     syllabus = models.FileField(upload_to='syllabus', blank=True, null=True)
 
     def get_users_reported(self):
@@ -184,6 +184,6 @@ class Cluster(models.Model):
     users = models.ManyToManyField(User)
 
     def get_members(self):
-        return "\n".join([u.username for u in self.users.all()])
+        return "\n".join([u.profile.username for u in self.users.all()])
 
 

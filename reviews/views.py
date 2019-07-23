@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404, render
 from .models import Restaurant, Review, Cluster, College, Department, Topic, Response, Profile
-from .forms import ReviewForm, GeneralReviewForm, TopicForm, ResponseForm, ProfileForm, DepartmentForm, ContentForm, FindReviewForm, InviteForm
+from .forms import ReviewForm, GeneralReviewForm, TopicForm, ResponseForm, ProfileForm, DepartmentForm, ContentForm, FindReviewForm, CollegeForm
 from django.http import HttpResponseRedirect,HttpResponse,HttpResponseForbidden
 from django.urls import reverse
 from django.core.paginator import Paginator
@@ -10,6 +10,7 @@ from django.contrib.auth.models import User
 from .suggestions import update_clusters
 from itertools import chain
 from django.db.models import Count
+from django.utils import timezone
 try:
     from django.utils import simplejson as json
 except ImportError:
@@ -38,11 +39,16 @@ except ImportError:
 #     restaurants = Restaurant.objects.filter(college_id=college_id).order_by('name')
 #     return render(request, 'restaurant_dropdown_list_options.html', {'restaurants': restaurants})
 def redirect(request):
-    try:
-        request.user.profile
-        return HttpResponseRedirect(reverse('reviews:latest'))
-    except:
-        return HttpResponseRedirect(reverse('reviews:add_new_profile',kwargs={'user_id':request.user.id}))
+    if request.user.is_authenticated and request.user.profile:
+        return HttpResponseRedirect(reverse('reviews:user_recommendation_list'))
+    elif request.user.is_authenticated:
+        return HttpResponseRedirect(reverse('reviews:add_profile'))
+    else:
+        return HttpResponseRedirect(reverse('reviews:user_recommendation_list'))
+    #     return HttpResponseRedirect(reverse('reviews:latest'))
+    # else:
+    #     return HttpResponseRedirect(reverse('reviews:review_list'))
+    
 
 def add_department(request,user_id):
     college = request.user.profile.college
@@ -63,40 +69,42 @@ def add_a_review(request):
             
             college = College.objects.filter(name = form.cleaned_data['college']).get()
             department = Department.objects.filter(college = college).filter(name = form.cleaned_data['department']).get()
-            restaurant = Restaurant.objects.filter(department = department).filter(name = form.cleaned_data['restaurant']).get()
 
-            lst = form.cleaned_data['assessment']
-            assessment = ''
-            for item in lst:
-                assessment = assessment + item + ' '
+
+            # lst = form.cleaned_data['assessment']
+            # assessment = ''
+            # for item in lst:
+            #     assessment = assessment + item + ' '
             
-            if form.cleaned_data['name'] == '':
-                user_name = request.user.profile.username
-            else:
-                user_name = form.cleaned_data['name']
+            # if form.cleaned_data['name'] == '':
+            #     user_name = request.user.profile.username
+            # else:
+            #     user_name = form.cleaned_data['name']
 
-            syllabus = None
-            if request.FILES:
-                syllabus = request.FILES['syllabus']
+            # syllabus = None
+            # if request.FILES:
+            #     syllabus = request.FILES['syllabus']
+            
 
+            # Add a class
+            restaurant = Restaurant(
+            name = form.cleaned_data['restaurant'],
+            department = department
+            )
+            restaurant.save()
 
+            # Add review for the new class
             review = Review(
-            pub_date = datetime.datetime.now(),
-            user_name = user_name,
+            pub_date = timezone.now(),
             rating = form.cleaned_data['rating'],
             prof_name = form.cleaned_data['prof_name'],
-            assessment = assessment,
-            title = form.cleaned_data['title'],
-            work_load = form.cleaned_data['work_load'],
-            diff_level = form.cleaned_data['diff_level'],
-            syllabus = syllabus,
             comment = form.cleaned_data['comment'])
             review.restaurant = restaurant
+            review.user = request.user
+            review.restaurant.department.sub.add(request.user) 
             review.save()
-            review.user.add(request.user) 
-            review.restaurant.department.sub.add(request.user)
-            
-            return HttpResponseRedirect(reverse('reviews:latest'))
+   
+            return HttpResponseRedirect(reverse('reviews:user_recommendation_list'))
     
     context = { 'form':form }
 
@@ -122,16 +130,39 @@ def latest(request):
         for d in department_list:
             topic_list = list(chain(topic_list,Topic.objects.filter(department=d)))
             for r in Restaurant.objects.filter(department=d):
-                review_list = list(chain(review_list,Review.objects.filter(restaurant=r)))
+                review_list = list(chain(review_list,Review.objects.exclude(users_reported=request.user).filter(restaurant=r)))
 
     else:
         review_list = Review.objects.order_by('-pub_date')
         topic_list = Topic.objects.order_by('-act_date')
         user_review_list = None
+
+    form = FindReviewForm()
+    if request.POST: 
+            form = FindReviewForm(request.POST)
+            if form.is_valid():
+                department = form.cleaned_data['department']
+                return HttpResponseRedirect(reverse('reviews:department_list',kwargs={'department_id':department.id}))
     
     result_list = sorted(
         chain(review_list, topic_list),
         key = lambda instance: instance.pub_date, reverse = True)
+
+
+
+    restaurants = Restaurant.objects.all()
+    most_recommended = sorted(restaurants, key=lambda r: r.average_rating(), reverse=True)[:4]
+
+    most_followed = Department.objects.annotate(q_count=Count('sub')) \
+                                 .order_by('-q_count')[:4]
+    # most_active = Topic.objects\
+    #             .annotate(num_likes=Count('users_liked')) \
+    #             .order_by('-num_likes')[:5]
+    most_helpful = Review.objects\
+                .annotate(num_liked=Count('users_liked')) \
+                .order_by('-num_liked')[:4]
+
+
     
     paginator = Paginator(result_list, 10)
     page = request.GET.get('page')
@@ -139,7 +170,11 @@ def latest(request):
 
     context = {'result_list':result_list,
                'sub_dept_list':department_list,
-               'user_review_list':user_review_list}
+               'user_review_list':user_review_list,
+               'most_recommended':most_recommended,
+               'most_helpful':most_helpful,
+               'most_followed':most_followed,
+               'form':form}
 
     return render(request,"reviews/latest.html",context)
 
@@ -201,19 +236,19 @@ def find_review_result(request,department_id=None):
 
 def review_list(request):
     restaurants = Restaurant.objects.all()
-    most_recommended = sorted(restaurants, key= lambda r: r.average_rating(), reverse=True)[:4]
+    most_recommended = sorted(restaurants, key=lambda r: r.average_rating(), reverse=True)[:5]
 
     most_followed = Department.objects.annotate(q_count=Count('sub')) \
-                                 .order_by('-q_count')[:4]
+                                 .order_by('-q_count')[:5]
     most_active = Topic.objects\
                 .annotate(num_likes=Count('users_liked')) \
-                .order_by('-num_likes')[:4]
+                .order_by('-num_likes')[:5]
     most_helpful = Review.objects\
                 .annotate(num_liked=Count('users_liked')) \
-                .order_by('-num_liked')[:4]
+                .order_by('-num_liked')[:5]
     most_inside = User.objects\
                 .annotate(num_inside=Count('department')) \
-                .order_by('-num_inside')[:4]
+                .order_by('-num_inside')[:5]
 
     form = FindReviewForm()
     if request.POST: 
@@ -432,9 +467,9 @@ def add_review(request, department_id):
     department = get_object_or_404(Department, pk=department_id)
     if request.POST:
         form = ReviewForm(department,request.POST)
-    else:
-        form = ReviewForm(department)  
-    if form.is_valid():
+        if form.is_valid() == False:
+            print('Trouble')
+        if form.is_valid():
         ### NO NEED FOR - already set as part of valid modelform ::: rating = form.cleaned_data['rating']
         ### AS WELL AS ::: comment = form.cleaned_data['comment']
 
@@ -445,20 +480,22 @@ def add_review(request, department_id):
         #     user_name = request.user.username
 
         #user_name = request.user.username
-        restaurant = form.cleaned_data['restaurant']
-        review = form.save(commit=False) # commit = False means that this instantiate but not save a Review model object
+        #restaurant = form.cleaned_data['restaurant']
+
+            review = form.save(commit=False) # commit = False means that this instantiate but not save a Review model object
         # review.restaurant = restaurant
         # review.user_name = user_name # Why use this instead of a ForeignKey to user?
-        review.pub_date = datetime.datetime.now() # works as long as pub_date is a DateTimeField
-        review.save() # save to the DB now       
+            review.user = request.user
+            review.pub_date = timezone.now() # works as long as pub_date is a DateTimeField
+            review.save() # save to the DB now       
 
-        #update_clusters()
+            update_clusters()
         # Always return an HttpResponseRedirect after successfully dealing
         # with POST data. This prevents data from being posted twice if a
         # user hits the Back button.
-        return HttpResponseRedirect(reverse('reviews:restaurant_detail', kwargs={'restaurant_id':restaurant.id}))
-    
-    return render(request, 'reviews/add_review.html', {'form': form,'department':department})
+            return HttpResponseRedirect(reverse('reviews:user_recommendation_list'))
+    return HttpResponseRedirect(reverse('reviews:user_recommendation_list'))
+    #return render(request, 'reviews/user_recommendation_list.html', {'form': form,'department':department})
 
 
 def user_profile(request,user_id):
@@ -490,7 +527,7 @@ def add_new_profile(request,user_id):
             profile = form.save(commit=False) # commit = False means that this instantiate but not save a Review model object
             profile.user = user
             profile.save() # save to the DB now       
-            return HttpResponseRedirect(reverse('reviews:add_department',kwargs={'user_id':user.id}))
+            return HttpResponseRedirect(reverse('reviews:redirect'))
     # Display empty form 
     form = ProfileForm() 
     context = {"form":form}
@@ -509,14 +546,6 @@ def add_profile(request,user_id):
             profile.user = user
             profile.save()
             return HttpResponseRedirect(reverse('reviews:user_profile', kwargs={'user_id':user.id}))
-    # Add new profile    
-    elif request.POST:
-        form = ProfileForm(request.POST)
-        if form.is_valid():
-            profile = form.save(commit=False) # commit = False means that this instantiate but not save a Review model object
-            profile.user = user
-            profile.save() # save to the DB now       
-            return HttpResponseRedirect(reverse('reviews:user_profile',kwargs={'user_id':user.id}))
     # Display empty form
     else: 
         form = ProfileForm() 
@@ -584,7 +613,7 @@ def add_response(request, topic_id):
         response = form.save(commit=False) # commit = False means that this instantiate but not save a Review model object
         response.topic = topic
         response.username = user_name
-        response.pub_date = datetime.datetime.now() # works as long as pub_date is a DateTimeField
+        response.pub_date = timezone.now() # works as long as pub_date is a DateTimeField
         response.save() # save to the DB now       
         response.user.add(request.user)
         topic.save() # update topic time
@@ -649,58 +678,70 @@ def add_general_review(request):
 
     return render(request,'reviews/add_general_review.html', context)
 
-@login_required
+
 def edit_review(request, review_id):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect('/accounts/login/')
     review = get_object_or_404(Review, pk=review_id)
     if review.user != request.user:
         return HttpResponseForbidden()
 
-    form = ReviewForm(request.POST or None, instance=review)
-    if request.POST and form.is_valid():
-        form.save()
-
+    form = ReviewForm(department=review.restaurant.department,instance=review)
+    if request.POST:
+            rating = request.POST['rating']
+            review.rating = rating
+            prof_name = request.POST['prof_name']
+            review.prof_name = prof_name
+            comment = request.POST['comment']
+            review.comment = comment
+            review.save()
         # Save was successful, so redirect to another page
         # next = request.POST.get('next', '/')
         # return HttpResponseRedirect(next)
-        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+            return HttpResponseRedirect('/recommendation/')
 
     return render(request, 'reviews/edit_review.html', {
         'review': review,
         'form': form
     })
 
-@login_required
-def delete_review(request, review_id):
-    review = get_object_or_404(Review, pk=review_id)
-    user_name = review.user_name
-    if user_name != request.user.username:
-        return HttpResponseForbidden()
 
+def delete_review(request, review_id):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect('/accounts/login/')
+    review = get_object_or_404(Review, pk=review_id)
+    if review.user != request.user:
+        return HttpResponseForbidden()
     review.delete()
     # next = request.POST.get('next', '/')
     # return HttpResponseRedirect(next)
-    return HttpResponseRedirect(reverse('reviews:user_profile'))
+    return HttpResponseRedirect(reverse('reviews:user_recommendation_list'))
     # return render(request, 'reviews/edit_review.html', {
     #     'review': review,
     #     'form': form
     # })
 
-@login_required
-def report_review(request, review_id):
-    review = get_object_or_404(Review, pk=review_id)
-    if request.user in review.users_reported.all():
+
+def report_review(request):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect('/accounts/login/')
+    if request.method == 'POST':
+        review_id = request.POST.get('review_id')
+        review = get_object_or_404(Review, pk=review_id)
+        
+        if request.user in review.users_reported.all():
     #if review in request.user.userprofile.report_review_set.all():
         # next = request.POST.get('next', '/')
         # return HttpResponseRedirect(next)
-        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
-    else:
-        review.users_reported.add(request.user)
-        if review.get_report_counts() >= 5:
-            review.delete()
+            return None
+        else:
+            review.users_reported.add(request.user)
+            if review.get_report_counts() >= 10:
+                review.delete()
         # next = request.POST.get('next', '/')
         # return HttpResponseRedirect(next)
-        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
-
+    return HttpResponse(json.dumps({}), content_type='application/json')
+   
 def like_review(request):
     if not request.user.is_authenticated:
         return HttpResponseRedirect('/accounts/login/')
@@ -743,7 +784,7 @@ def like_review(request):
     #                return HttpResponse("Success!") # Sending an success response
 
 
-@login_required
+
 def edit_topic(request, topic_id):
     topic = get_object_or_404(Topic, pk=topic_id)
     if topic.user_name != request.user.username:
@@ -795,18 +836,26 @@ def report_topic(request, topic_id):
         # return HttpResponseRedirect(next)
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
-def like_topic(request, topic_id):
-    topic = get_object_or_404(Topic, pk=topic_id)
-    if request.user in topic.users_liked.all():
-    #if review in request.user.userprofile.report_review_set.all():
-        # next = request.POST.get('next', '/')
-        # return HttpResponseRedirect(next)
-        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
-    else:
-        topic.users_liked.add(request.user)
-        # next = request.POST.get('next', '/')
-        # return HttpResponseRedirect(next)
-        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+def like_topic(request):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect('/accounts/login/')
+    if request.method == 'POST':
+        topic_id = request.POST.get('topic_id')
+        topic = get_object_or_404(Topic, pk=topic_id)
+
+        if request.user in topic.users_liked.all():
+            # user has already liked this company
+            # remove like/user
+            topic.users_liked.remove(request.user)
+    
+        else:
+            # add a new like for a company
+            topic.users_liked.add(request.user)
+
+
+    #ctx = {'likes_count': review.get_like_counts}
+    # use mimetype instead of content_type if django < 5
+    return HttpResponse(json.dumps({}), content_type='application/json')
 
 
 
@@ -834,12 +883,36 @@ def like_topic(request, topic_id):
 #                 'profile_completed':profile_completed}
 #     return render(request,'reviews/user_review_list.html',context)
 
-@login_required
+
+
+
 def user_recommendation_list(request):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect('/accounts/login/')
+    college = request.user.profile.college
+    try:
+        department=form.cleaned_data['department']
+    except:
+        department = Department.objects.filter(college=college).first()
+    form = FindReviewForm()
+    form2 = ReviewForm(department)
+
+    if request.POST:
+        #form = GeneralReviewForm(request.POST,request.FILES)
+        form = FindReviewForm(request.POST)
+        if form.is_valid():
+            college = form.cleaned_data['college']
+            department = form.cleaned_data['department']
+            form = FindReviewForm(initial={'department':department,'college':college})
+            form2 = ReviewForm(department)
+
+    latest_review_list = Review.objects.filter(user=request.user).order_by('-pub_date')
+
     # get this user reviews
-    user_reviews = Review.objects.filter(user_name=request.user.username).prefetch_related('restaurant')
+    user_reviews = Review.objects.filter(user=request.user).prefetch_related('restaurant')
     # from the reviews, get a set of restaurant IDs
     user_reviews_restaurant_ids = set(map(lambda x: x.restaurant.id, user_reviews))
+
 
     try:
         user_cluster_name = \
@@ -848,15 +921,12 @@ def user_recommendation_list(request):
         update_clusters()
         user_cluster_name = \
             request.user.cluster_set.first().name
-
+   
     user_cluster_other_members = \
-        Cluster.objects.get(name=user_cluster_name).users \
-            .exclude(username=request.user.username).all()
-    other_members_usernames = set(map(lambda x: x.username, user_cluster_other_members))
-
+       User.objects.filter(cluster__in=request.user.cluster_set.all())
 
     other_users_reviews = \
-        Review.objects.filter(user_name__in=other_members_usernames) \
+        Review.objects.filter(user__in=user_cluster_other_members) \
             .exclude(restaurant_id__in=user_reviews_restaurant_ids)
     other_users_reviews_restaurant_ids = set(map(lambda x: x.restaurant.id, other_users_reviews))
 
@@ -866,9 +936,20 @@ def user_recommendation_list(request):
         key=Restaurant.average_rating, 
         reverse=True
     )
+    
+    count = Review.objects.filter(user=request.user).count()
+    restaurant_list = restaurant_list[0:2*count]
+    
+    context = {'username': request.user.profile.username,
+               'restaurant_list': restaurant_list,
+               'latest_review_list':latest_review_list,
+                'form':form,
+                'form2':form2,
+                'college':college,
+                'department':department}
 
     return render(
         request, 
         'reviews/user_recommendation_list.html', 
-        {'username': request.user.username,'restaurant_list': restaurant_list}
+        context
     )

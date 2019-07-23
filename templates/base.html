@@ -15,7 +15,7 @@
     <title>Department Insider</title>
     <style>
 body{
-
+  background-color: #F1F3F4
 }
 
 html {
@@ -68,17 +68,17 @@ p.capitalize {
     <a class="navbar-item" style="color:white"><strong>Department Insider</strong></a>
       <ul class="navbar-nav mr-auto">
         <li class="nav-item">
-          <a class="nav-link d-none d-sm-none d-md-block d-lg-block" href="{% url 'reviews:latest' %}" style="color:white"><i class='fas fa-home'></i> Latest</a>
-          <a class="nav-link d-block d-sm-block d-md-none d-lg-none" href="{% url 'reviews:latest' %}" style="color:white">&nbsp<i class='fas fa-home'></i></a>
+          <a class="nav-link d-none d-sm-none d-md-block d-lg-block" href="{% url 'reviews:user_recommendation_list' %}" style="color:white"><i class='fas fa-home'></i> Home</a>
+          <a class="nav-link d-block d-sm-block d-md-none d-lg-none" href="{% url 'reviews:user_recommendation_list' %}" style="color:white">&nbsp<i class='fas fa-home'></i></a>
         </li>
         <li class="nav-item">
-          <a class="nav-link d-none d-sm-none d-md-block d-lg-block" href="{% url 'reviews:review_list' %}" style="color:white"><i class='fas fa-search'></i> Explore</a></a>
-          <a class="nav-link d-block d-sm-block d-md-none d-lg-none" href="{% url 'reviews:review_list' %}" style="color:white">&nbsp<i class='fas fa-search'></i></a>
+          <a class="nav-link d-none d-sm-none d-md-block d-lg-block" href="{% url 'reviews:latest' %}" style="color:white"><i class='fas fa-search'></i> Explore</a></a>
+          <a class="nav-link d-block d-sm-block d-md-none d-lg-none" href="{% url 'reviews:latest' %}" style="color:white">&nbsp<i class='fas fa-search'></i></a>
         </li>
-        <li class="nav-item">
+        <!-- <li class="nav-item">
           <a class="nav-link d-none d-sm-none d-md-block d-lg-block" href="{% url 'reviews:add_general_review' %}" style="color:white"><i class='fas fa-pen'></i> Evaluate</a>
           <a class="nav-link d-block d-sm-block d-md-none d-lg-none" href="{% url 'reviews:add_general_review' %}" style="color:white">&nbsp<i class='fas fa-pen'></i></a>
-        </li>
+        </li> -->
       </ul>
       <ul class="navbar-nav ml-auto">
         <li class="nav-item">

@@ -1,32 +1,18 @@
+{% extends 'base.html' %}
 {% load bootstrap4 %}
-{% bootstrap_javascript %}
-
-<head>
-	<link rel="stylesheet" href="https://unpkg.com/bootstrap-material-design@4.1.1/dist/css/bootstrap-material-design.min.css" integrity="sha384-wXznGJNEXNG1NFsbm0ugrLFMQPWswR3lds2VeinahP8N0zJw9VWSopbjv2x7WCvX" crossorigin="anonymous">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Complete your profile</title>
-</head>
-
-{% block bootstrap4_content %}
-<nav class="navbar navbar-light bg-primary fixed-top">
-  <div class="container">
-    <a class="navbar-item" style="color:white"><strong>Department Insider: Tutorial</strong></a>
-    <a class="navbar-item" style="color:white"> Set up profile >> Join departments >> Write feedback</a>
-</nav>
-<div>
-	<br><br><br>
-
-
-
-<div class="container">
-<script type = "text/javascript" src = "//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js" ></script>
+{% block title %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 {{ form.media.css }}
-<div class="card">
+{% endblock %}
+
+
+{% block content %}
+
+
   <div class="card-header text-primary">
-    <h2>Please add a feedback for a class you've taken</h2>
-    <h6>and you will automatically join the department you've evaluated (◕‿◕✿)</h6>
+    <h2>Can't find your class? Tell us the class name and review it here!</h2>
   </div>
-  <div class="card-body">
+  <div class="card-body" style="background-color: white">
 
 <form action="{% url 'reviews:add_a_review'%}" method="post" class="form" enctype="multipart/form-data">
 {% csrf_token %}
@@ -35,12 +21,11 @@
 {% endfor %}
 {% buttons %}
 <button type="submit" class="btn btn-raised btn-primary">
-     Finish >>
+     Submit
 </button>
 {% endbuttons %}
 </form>
   </div>
-</div>
+
 {{ form.media.js }}
-</div>
 {% endblock %}

@@ -3,6 +3,7 @@ from reviews.models import Review, Restaurant, College, Department, Topic, Respo
 from django import forms
 from django.contrib.auth.models import User
 from django_select2.forms import ModelSelect2Widget, Select2MultipleWidget
+from django.utils.safestring import mark_safe
 
 class ProfileForm(ModelForm):
     class Meta:
@@ -19,23 +20,33 @@ class ReviewForm(ModelForm):
         ('Papers','Papers')
         )
         model = Review
-        fields = ['restaurant','title','user_name','rating','comment','prof_name','diff_level','syllabus','work_load','assessment']
+        fields = ['restaurant','rating','comment','prof_name','syllabus']
         #fields = ['rating','user_name','prof_name','pre_req','materials','class_size','assessment','work_load','diff_level','comment']
         widgets = {
-            'comment': Textarea(attrs={'cols': 40, 'rows': 15}),
-            'assessment': Select2MultipleWidget(choices=ASSESSMENTS),
+            'comment': Textarea(attrs={'cols': 40, 'rows': 2}),
         }
         labels = {
             "restaurant": "Class",
-            "user_name": "Anonymous name"
+            "prof_name": "Taught by",
+            "rating": "Liking",
         }
         help_texts = {
-            'user_name': 'Want to be anonymous? Use a name different than your username! Be creative!',
+            'restaurant': mark_safe("Can't find your class? <a class='text-secondary' href='/class/add_a_review'><u>Click here</u></a>"),
         }
+
 
     def __init__(self, department, *args, **kwargs):
         super(ReviewForm, self).__init__(*args, **kwargs)
         self.fields['restaurant'].queryset = Restaurant.objects.filter(department=department)
+
+class CollegeForm(ModelForm):
+    class Meta:
+        model = Restaurant
+        fields = ['department']
+
+    def __init__(self, college, *args, **kwargs):
+        super(CollegeForm, self).__init__(*args, **kwargs)
+        self.fields['department'].queryset = Department.objects.filter(college=college)
 
 class TopicForm(ModelForm):
     class Meta:
@@ -56,15 +67,20 @@ class ResponseForm(ModelForm):
             'username': 'Your desired name to be displayed. If blank, your username will be used.',
         }
 
-class DepartmentForm(forms.Form):
-    college = forms.ModelChoiceField(
-        queryset=College.objects.all(),
-        label=u"College",
-        widget=ModelSelect2Widget(
-            model=College,
-            search_fields=['name__icontains'],
-        )
-    )
+class DepartmentForm(ModelForm):
+    class Meta:
+        model = Department
+        fields = ['college']
+
+    
+    # college = forms.ModelChoiceField(
+    #     queryset=College.objects.all(),
+    #     label=u"College",
+    #     widget=ModelSelect2Widget(
+    #         model=College,
+    #         search_fields=['name__icontains'],
+    #     )
+    # )
 
 
 class ContentForm(forms.Form):
@@ -80,6 +96,7 @@ class ContentForm(forms.Form):
 
 class FindReviewForm(forms.Form):
     college = forms.ModelChoiceField(
+        required=False,
         queryset=College.objects.all(),
         label=u"College",
         widget=ModelSelect2Widget(
@@ -89,6 +106,7 @@ class FindReviewForm(forms.Form):
     )
 
     department = forms.ModelChoiceField(
+        required=False,
         queryset=Department.objects.all(),
         label=u"Department",
         widget=ModelSelect2Widget(
@@ -126,16 +144,16 @@ class GeneralReviewForm(forms.Form):
         )
     )
 
-    restaurant = forms.ModelChoiceField(
-        queryset=Restaurant.objects.all(),
-        label=u"Class",
-        widget=ModelSelect2Widget(
-            model=Restaurant,
-            search_fields=['name__icontains'],
-            dependent_fields={'department': 'department'},
-            max_results=500,
-        )
-    )
+    # restaurant = forms.ModelChoiceField(
+    #     queryset=Restaurant.objects.all(),
+    #     label=u"Class",
+    #     widget=ModelSelect2Widget(
+    #         model=Restaurant,
+    #         search_fields=['name__icontains'],
+    #         dependent_fields={'department': 'department'},
+    #         max_results=500,
+    #     )
+    # )
 
     RATING_CHOICES = (
         (1,'1'),
@@ -161,18 +179,19 @@ class GeneralReviewForm(forms.Form):
         (5,'Suffocating'),
     )
     
-    name = forms.CharField(label=u"Anonymous name",max_length=100,required=False,help_text='To be anonymous, put something different than your username - show your creativity! If blank, your username will be used.')
-    rating = forms.ChoiceField(label=u"Recommendation out of 5",choices=RATING_CHOICES)
-    prof_name = forms.CharField(label=u"Taken with",help_text='instructor name', max_length=100)
-    assessment = forms.MultipleChoiceField(choices=ASSESSMENTS, widget=Select2MultipleWidget,help_text='select all options applicable')
-    title = forms.CharField(label=u"This class in one sentence",max_length=50)
+    restaurant = forms.CharField(label=u"Type in your class full name here",max_length=100)
+    #name = forms.CharField(label=u"Anonymous name",max_length=100,required=False,help_text='To be anonymous, put something different than your username - show your creativity! If blank, your username will be used.')
+    rating = forms.ChoiceField(label=u"Liking",choices=RATING_CHOICES)
+    prof_name = forms.CharField(label=u"Taught by", max_length=100)
+    #assessment = forms.MultipleChoiceField(choices=ASSESSMENTS, widget=Select2MultipleWidget,help_text='select all options applicable')
+    #title = forms.CharField(label=u"This class in one sentence",max_length=50)
     #pre_req = forms.CharField(label=u"Prior knowledge",max_length=100)
     #materials = forms.CharField(label=u"Materials needed",max_length=100)
-    work_load = forms.IntegerField(help_text='hours spent outside class per week')
-    diff_level = forms.ChoiceField(label=u"Difficulty level",choices=DIFF_LEVEL)
+    #work_load = forms.IntegerField(help_text='hours spent outside class per week')
+    #diff_level = forms.ChoiceField(label=u"Difficulty level",choices=DIFF_LEVEL)
     
     comment = forms.CharField(label=u"Class Feedback",max_length=400,widget=forms.Textarea(attrs={"rows":5, "cols":20}))
-    syllabus = forms.FileField(label=u"Upload Syllabus(Optional)",required=False)
+    #syllabus = forms.FileField(label=u"Upload Syllabus(Optional)",required=False)
 # class GeneralReviewForm(forms.ModelForm):
 #     class Meta:
 #         model = Review

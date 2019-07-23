@@ -2,7 +2,7 @@
 {% load bootstrap4 %}
 
 {% block title %}
-<h3>Edit your review</h3>
+<h3>Edit your review for  {{ review.restaurant.name }}</h3>
 {% endblock %}
 
 {% block content %}
@@ -10,13 +10,13 @@
 
 <form action="{% url 'reviews:edit_review' review.id %}" method="post" class="form">
     {% csrf_token %}
-
-    {% for field in form %}
-        {% bootstrap_field field %}
-    {% endfor %}
+    {{ form2.non_field_errors }} 
+    {% bootstrap_field form.prof_name %}
+    {% bootstrap_field form.rating %}
+    {% bootstrap_field form.comment %}
 
     <button type="submit" class="btn btn-primary"> Save </button>
-    <a href="{% url 'reviews:review_detail' review.id %}"> Cancel </a>
+    <a class="btn btn-primary" href="{% url 'reviews:user_recommendation_list' %}"> Cancel </a>
 
 </form>
 {% endblock %}
