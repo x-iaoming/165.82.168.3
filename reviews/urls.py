@@ -12,7 +12,7 @@ urlpatterns = [
     # ex: /
     url(r'^explore$', views.review_list, name='review_list'),
     url(r'^latest$', views.latest, name='latest'),
-    url(r'^redirect$', views.redirect, name='redirect'),
+    url(r'^$', views.redirect, name='redirect'),
     url(r'^denied/(?P<department_id>[0-9]+)/$', views.denied, name='denied'),
     #url(r'^invite/(?P<department_id>[0-9]+)/$', views.invite, name='invite'),
     # ex: /review/5/

@@ -190,13 +190,15 @@ $(document).ready(function() {
 
     {% for restaurant in restaurant_list %}
     <div class="card-header">
-        <a href="{% url 'reviews:restaurant_detail' restaurant.id %}"><u>
-        {{ restaurant.name }}
+         <a href="{% url 'reviews:restaurant_detail' restaurant.id %}">
+         {{ forloop.counter }}.  
+         <u>
+         {{ restaurant.department.college.name }} {{ restaurant.name }}
         </u></a>
     </div>
     <div class="card-body" style="background-color: white">
-        <h6>{{ restaurant.review_set.count }} reviews</h6>
-        <h6>{{ restaurant.average_rating | floatformat }} average liking</h6>
+        <strong>Average {{ restaurant.average_rating | floatformat }} / 5</strong>
+        <br>Reviewed by {{ restaurant.review_set.count }} insiders
     </div>
 
     {% endfor %}

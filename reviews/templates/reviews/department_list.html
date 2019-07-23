@@ -249,28 +249,46 @@ You can choose to be anonymous when posting. ALL post contents are visible to {{
             <h5 class="text-primary"> {{ result.title }} </h5>
             <div class="text-secondary">{{ result.user_name }}; {{ result.pub_date }}</div>
             <strong>{{ result.comment }}</strong>
-            <div></div>
-            <input type="button" class="btn btn-primary" id="like{{ result.id }}" value="Like | {{ result.get_like_counts }}" name="{{ result.id }}" />
-            <a onclick="return confirm('You will not see this review after reporting. Proceed?')" href="{% url 'reviews:report_review' result.id %}">&nbsp &nbsp Report</a>
+           <div id="count{{ result.id }}" >
+          <button style="color:grey" type="button" class="btn btn-primary btn-sm" id="like{{ result.id }}" name="{{ result.id }}">
+          <i class="far fa-thumbs-up"></i> {{ result.get_like_counts }}</button>
+          <button style="color:grey" id="{{ result.id }}" class="btn btn-primary">&#9873</button>
+        </div>
           </div>  
         </div> 
 
 <script>
 $('#like{{ result.id }}').on("click",function(){
-      $.ajax({
-               type: "POST",
-               url: "{% url 'reviews:like_review' %}",
-               data: {'review_id': $(this).attr('name'), 'csrfmiddlewaretoken': '{{ csrf_token }}'},
-               dataType: "json",
-               success: function() {
-                $("#count{{ result.id }}").load(window.location.href + " #count{{ result.id }}");
-                },
-               error: function(rs, e) {
-                    alert(rs.responseText);
+           
+                $.ajax({
+                         type: "POST",
+                         url: "{% url 'reviews:like_review' %}",
+                         data: {'review_id': $(this).attr('name'), 'csrfmiddlewaretoken': '{{ csrf_token }}'},
+                         dataType: "json",
+                         success: function() {
+                          $("#count{{ result.id }}").load(window.location.href + " #count{{ result.id }}");
+                          },
+                         error: function(rs, e) {
+                              alert(rs.responseText);
+                          }
+                    }); 
+              })
+          $('#{{ result.id }}').on("click",function(){
+             if (confirm('You will not see this review after reporting it. Continue?')){
+                $.ajax({
+                         type: "POST",
+                         url: "{% url 'reviews:report_review' %}",
+                         data: {'review_id': $(this).attr('id'), 'csrfmiddlewaretoken': '{{ csrf_token }}'},
+                         dataType: "json",
+                         success: function() {
+                              location.reload()
+                          },
+                         error: function(rs, e) {
+                              alert(rs.responseText);
+                          }
+                    }); 
                 }
-          }); 
-      
-    })
+              })
 </script>
       {% else %}
         <!-- <div class="card">
@@ -294,7 +312,7 @@ $('#like{{ result.id }}').on("click",function(){
 </div>
 {% else %}
 <div class="card-body">
-<h5 class="card-subtitle mb-2 text-muted">{{department.sub.count}} Insiders | You're NOT an insider yet.</h5>
+<h5 class="card-subtitle mb-2 text-muted">{{department.sub.count}} Insiders | You have to join the group to view classes and reviews.</h5>
 <p class="card-text">
 The {{ department.college.name}} {{ department.name}} community is for any current students, alumns, and prospective students to <strong>freely and honestly discuss topics related to {{ department.name}} and share their experiences and resources.</strong>
 <p>

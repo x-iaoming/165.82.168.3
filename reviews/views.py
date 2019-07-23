@@ -39,10 +39,12 @@ except ImportError:
 #     restaurants = Restaurant.objects.filter(college_id=college_id).order_by('name')
 #     return render(request, 'restaurant_dropdown_list_options.html', {'restaurants': restaurants})
 def redirect(request):
-    if request.user.is_authenticated and request.user.profile:
-        return HttpResponseRedirect(reverse('reviews:user_recommendation_list'))
-    elif request.user.is_authenticated:
-        return HttpResponseRedirect(reverse('reviews:add_profile'))
+    if request.user.is_authenticated:
+        try:
+            request.user.profile
+            return HttpResponseRedirect(reverse('reviews:user_recommendation_list'))
+        except:
+            return HttpResponseRedirect(reverse('reviews:add_profile'))
     else:
         return HttpResponseRedirect(reverse('reviews:user_recommendation_list'))
     #     return HttpResponseRedirect(reverse('reviews:latest'))
@@ -197,8 +199,9 @@ def invite(request,department_id):
     return render(request,'reviews/invite.html',context)
 
 def denied(request,department_id):
-    context = {'department':get_object_or_404(Department,pk=department_id)}
-    return render(request,'reviews/permission_denied.html',context)
+    #context = {'department':get_object_or_404(Department,pk=department_id)}
+    # return render(request,'reviews/permission_denied.html',context)
+    return HttpResponseRedirect(reverse('reviews:department_list',kwargs={'department_id':department_id}))
 
 def find_review(request):
     form = FindReviewForm()

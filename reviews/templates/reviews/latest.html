@@ -86,6 +86,7 @@
       </div>
       <div class="card-body" style="background-color: white;padding-bottom: 0px">
         {% if user.is_authenticated %}
+        Taught by {{ result.prof_name }}
         {{ result.comment }}
         <!-- Testing -->
         <div id="count{{ result.id }}" >
@@ -199,7 +200,7 @@
       <h4 class="card-header text-primary">Popular groups
       </h4>
       {% for dept in most_followed %}
-      <div class="card-body" style="background-color: white"><a style="color:black" href="{% url 'reviews:department_list' dept.id%}"><strong><u>{{ dept.college.name }} {{ dept.name }}</u></strong></a>
+      <div class="card-body" style="background-color: white"><a style="color:black" href="{% url 'reviews:department_list' dept.id%}"><strong>{{ forloop.counter }}. <u>{{ dept.college.name }} {{ dept.name }}</u></strong></a>
         <br><a style="font-size: 13px">{{ dept.sub.count}} Insiders</a>
         <br>{{ dept.tagline}}
       </div>
@@ -207,7 +208,7 @@
       <h4 class="card-header text-primary">Best classes
       </h4>
       {% for class in most_recommended %}
-      <div class="card-body" style="background-color: white"><a style="color:black" href="{% url 'reviews:restaurant_detail' class.id %}"><strong><u>{{ class.department.college.name }} {{ class.name }}</u></strong></a>
+      <div class="card-body" style="background-color: white"><a style="color:black" href="{% url 'reviews:restaurant_detail' class.id %}"><strong>{{ forloop.counter }}. <u>{{ class.department.college.name }} {{ class.name }}</u></strong></a>
         <br>average recommended {{ class.average_rating | floatformat:2 }}
       </div>
       {% endfor %}

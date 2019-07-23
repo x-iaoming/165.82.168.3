@@ -6,17 +6,16 @@
   <div class="col-md-3" >
     <div class="card">
       <div class="card-header">
-        <a href="{% url 'reviews:department_list' restaurant.department.id %}"><< {{ restaurant.department.college.name}} {{ restaurant.department.name}}</a>
+        <a href="{% url 'reviews:department_list' restaurant.department.id %}">< {{ restaurant.department.college.name}} {{ restaurant.department.name}}</a>
+        <br><br>
         <h2><strong>{{ restaurant.name }}</strong></h2>
-        <a href="{% url 'reviews:add_review' restaurant.department.id%}"><span class="badge badge-pill badge-primary">+ Add class feedback</span></a>
-      </div>
-      <div class="card-body">
         <p class="card-text">
-          Total {{ restaurant.review_set.count }} reviews
-          <br> Average recommended {{ restaurant.average_rating | floatformat }} of 5 
-          <br>Average difficulty: {{ class.average_diff | floatformat }}
-          <br>Average workload: {{ class.average_wl | floatformat }} hours per week outside class
+          <strong> Average {{ restaurant.average_rating | floatformat }} / 5</strong>
+          <br>Reviewed by {{ restaurant.review_set.count }} insiders
+          <!-- <br>Average difficulty: {{ class.average_diff | floatformat }}
+          <br>Average workload: {{ class.average_wl | floatformat }} hours per week outside class -->
         </p>
+        <a href="{% url 'reviews:add_review' restaurant.department.id%}"><span class="badge badge-pill badge-primary">+ Add class feedback</span></a>
       </div>
     </div>
     <p></p>
@@ -30,11 +29,11 @@
             <div class="card">
               <div class="card-header">
                 <h4> Recommended {{ review.rating }} of 5 </h4>
-                 <div class="text-secondary">{{ review.user_name }}; {{ review.pub_date }}</div>
+                 <div class="text-secondary"> Anonymous | {{ review.pub_date }}</div>
               </div>
               <div class="card-body">
                 <strong>Taught by:</strong>  {{ review.prof_name }}
-                <br><strong>Workload:</strong>  {{ review.get_work_load_display }} hours per week outside class
+                <!-- <br><strong>Workload:</strong>  {{ review.get_work_load_display }} hours per week outside class
                 <br><strong>Level of difficulty:</strong>  {{ review.get_diff_level_display }}
                 <br><strong>Type of assessment:</strong>  {{ review.assessment }}
                 <br><strong>Prior knowledge:</strong>  {{ review.pre_req }}
@@ -42,9 +41,46 @@
                 {% if review.syllabus %}
                   <br><strong>Syllabus:</strong> <a href="{{ review.syllabus.url }}"> {{ review.syllabus.name }}</a></strong>
                 {% else %}
-                {% endif %}
-                <br><br><strong>{{ review.comment }}</strong>
-                <h6><a href="{% url 'reviews:like_review' %}">Helpful {{ review.get_like_counts }}</a><a onclick="return confirm('You will not see this review after reporting. Proceed?')" href="{% url 'reviews:report_review' review.id %}">&nbsp &nbsp Report</a></h6> 
+                {% endif %} -->
+                <br>{{ review.comment }}
+                 <div id="count{{ review.id }}" >
+          <button style="color:grey" type="button" class="btn btn-primary btn-sm" id="like{{ review.id }}" name="{{ review.id }}">
+          <i class="far fa-thumbs-up"></i> {{ review.get_like_counts }}</button>
+          <button style="color:grey" id="{{ review.id }}" class="btn btn-primary">&#9873</button>
+        </div>
+        <script>
+          $('#like{{ review.id }}').on("click",function(){
+           
+                $.ajax({
+                         type: "POST",
+                         url: "{% url 'reviews:like_review' %}",
+                         data: {'review_id': $(this).attr('name'), 'csrfmiddlewaretoken': '{{ csrf_token }}'},
+                         dataType: "json",
+                         success: function() {
+                          $("#count{{ review.id }}").load(window.location.href + " #count{{ review.id }}");
+                          },
+                         error: function(rs, e) {
+                              alert(rs.responseText);
+                          }
+                    }); 
+              })
+          $('#{{ review.id }}').on("click",function(){
+             if (confirm('You will not see this review after reporting it. Continue?')){
+                $.ajax({
+                         type: "POST",
+                         url: "{% url 'reviews:report_review' %}",
+                         data: {'review_id': $(this).attr('id'), 'csrfmiddlewaretoken': '{{ csrf_token }}'},
+                         dataType: "json",
+                         success: function() {
+                              location.reload()
+                          },
+                         error: function(rs, e) {
+                              alert(rs.responseText);
+                          }
+                    }); 
+                }
+              })
+        </script>
               </div>
             </div>
             <p></p>
