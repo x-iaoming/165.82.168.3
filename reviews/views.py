@@ -44,7 +44,7 @@ def redirect(request):
             request.user.profile
             return HttpResponseRedirect(reverse('reviews:user_recommendation_list'))
         except:
-            return HttpResponseRedirect(reverse('reviews:add_profile'))
+            return HttpResponseRedirect(reverse('reviews:add_new_profile',kwargs={'user_id':request.user.id}))
     else:
         return HttpResponseRedirect(reverse('reviews:user_recommendation_list'))
     #     return HttpResponseRedirect(reverse('reviews:latest'))
