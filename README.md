@@ -1,4 +1,5 @@
 # ruimingli.com
-My first website
+Department Insider
 
-Credit to https://www.codementor.io/jadianes/get-started-with-django-building-recommendation-review-app-du107yb1a
+A machine learning powered website that recommends your next favorite courses.
+Try it out at: [ruimingli.com](ruimingli.com)
