@@ -491,8 +491,10 @@ def add_review(request, department_id):
             review.user = request.user
             review.pub_date = timezone.now() # works as long as pub_date is a DateTimeField
             review.save() # save to the DB now       
-
-            update_clusters()
+            if not Review.objects.filter(user=request.user):
+                update_clusters(active=True)
+            else:
+                update_clusters()
         # Always return an HttpResponseRedirect after successfully dealing
         # with POST data. This prevents data from being posted twice if a
         # user hits the Back button.
@@ -920,28 +922,28 @@ def user_recommendation_list(request):
     try:
         user_cluster_name = \
             request.user.cluster_set.first().name
-    except: # if no cluster has been assigned for a user, update clusters
-        update_clusters()
-        user_cluster_name = \
-            request.user.cluster_set.first().name
-   
-    user_cluster_other_members = \
-       User.objects.filter(cluster__in=request.user.cluster_set.all())
 
-    other_users_reviews = \
-        Review.objects.filter(user__in=user_cluster_other_members) \
-            .exclude(restaurant_id__in=user_reviews_restaurant_ids)
-    other_users_reviews_restaurant_ids = set(map(lambda x: x.restaurant.id, other_users_reviews))
+        user_cluster_other_members = \
+           User.objects.filter(cluster__in=request.user.cluster_set.all())
 
-    # then get a restaurant list excluding the previous IDs
-    restaurant_list = sorted(
-        list(Restaurant.objects.filter(id__in=other_users_reviews_restaurant_ids)), 
-        key=Restaurant.average_rating, 
-        reverse=True
-    )
+        other_users_reviews = \
+            Review.objects.filter(user__in=user_cluster_other_members) \
+                .exclude(restaurant_id__in=user_reviews_restaurant_ids)
+        other_users_reviews_restaurant_ids = set(map(lambda x: x.restaurant.id, other_users_reviews))
+
+        # then get a restaurant list excluding the previous IDs
+        restaurant_list = sorted(
+            list(Restaurant.objects.filter(id__in=other_users_reviews_restaurant_ids)), 
+            key=Restaurant.average_rating, 
+            reverse=True
+        )
     
-    count = Review.objects.filter(user=request.user).count()
-    restaurant_list = restaurant_list[0:2*count]
+        count = Review.objects.filter(user=request.user).count()
+        restaurant_list = restaurant_list[0:2*count]
+
+    except: # if no cluster has been assigned for a user, update clusters  
+        restaurant_list = None
+    
     
     context = {'username': request.user.profile.username,
                'restaurant_list': restaurant_list,

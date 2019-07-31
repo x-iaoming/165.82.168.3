@@ -3,12 +3,15 @@ from django.contrib.auth.models import User
 from sklearn.cluster import KMeans
 from scipy.sparse import dok_matrix, csr_matrix
 import numpy as np
+import matplotlib.pylab as plt
 
-def update_clusters():
+
+def update_clusters(active=False):
     num_reviews = Review.objects.count()
     update_step = ((num_reviews/100)+1) * 5
+    passive = (num_reviews % update_step == 0)
     # num_reviews % update_step == 0
-    if num_reviews % update_step == 0: # using some magic numbers here, sorry...
+    if active or passive: # using some magic numbers here, sorry...
         # Create a sparse matrix from user reviews
         all_users = User.objects.all()
         all_restaurant_ids = set(map(lambda x: x.restaurant.id, Review.objects.only("restaurant")))
@@ -24,6 +27,12 @@ def update_clusters():
         kmeans = KMeans(n_clusters=k)
         clustering = kmeans.fit(ratings_m.tocsr())
         
+        # plt.spy(ratings_m)
+        # plt.ylabel('Class_id')
+        # plt.xlabel('User_id')
+        # plt.savefig('static/clustering')
+        # plt.close()
+
         # Update clusters
         Cluster.objects.all().delete()
         new_clusters = {i: Cluster(name=i) for i in range(k)}
@@ -31,3 +40,8 @@ def update_clusters():
             cluster.save()
         for i,cluster_label in enumerate(clustering.labels_):
             new_clusters[cluster_label].users.add(all_users[i])
+
+        # for i in range(num_users): # each user corresponds to a row, in the order of all_user_names
+        #     user_reviews = Review.objects.filter(user=all_users[i])
+        #     for user_review in user_reviews:
+        #         ratings_m[i,user_review.restaurant.id] = User.objects.filter
