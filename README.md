@@ -1,4 +1,3 @@
-# Department Insider
+# Go Go Music
 
-A machine learning powered website that recommends your next favorite courses.
-Try it out at: [ruimingli.com](http://ruimingli.com)
+A machine learning powered website that brings you the right music based on the scene.
